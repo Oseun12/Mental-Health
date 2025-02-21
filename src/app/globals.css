@@ -70,3 +70,11 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+/* h1, h2, h3, h4, h5, h6, p, span, a, div {
+  font-family: inherit;
+} */
