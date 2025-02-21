@@ -48,7 +48,7 @@ export default function Testimonials() {
                 </button>
             </div>
             <div className=" w-1/2 text-center p-4 transition-all duration-500 text-black bg-white shadow-lg rounded-lg">
-                <p className="text-lg italic">"{testimonials[index].text}"</p>
+                <p className="text-lg italic">{testimonials[index].text}</p>
                 <h4 className="mt-4 font-semibold">- {testimonials[index].name}</h4>
             </div>
         </div>
