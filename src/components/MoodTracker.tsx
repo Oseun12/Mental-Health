@@ -10,20 +10,23 @@ export default function MoodHistory() {
     queryKey: ["moods"],
     queryFn: async () => {
       const res = await fetch("/api/mood");
-      return res.json();
+      const data = await res.json();
+      console.log("Fetched moods data:", data);
+      return data;
     },
-    enabled: !!session, // Only fetch if user is logged in
+    enabled: !!session,
   });
+  
 
   if (isLoading) return <p>Loading mood history...</p>;
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">
-      {moods.moods.length === 0 ? (
+      {moods?.moods?.length === 0 ? ( // Add optional chaining to avoid undefined error
         <p>No mood check-ins yet.</p>
       ) : (
         <ul className="space-y-2">
-          {moods.moods.map((mood: any) => (
+          {moods?.moods?.map((mood: any) => (
             <li key={mood._id} className="p-2 bg-gray-100 rounded">
               <strong>{mood.mood}</strong> - {new Date(mood.createdAt).toLocaleDateString()}
             </li>
@@ -32,4 +35,5 @@ export default function MoodHistory() {
       )}
     </div>
   );
+  
 }

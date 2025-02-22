@@ -13,6 +13,7 @@ import Link from "next/link";
 import MindfulnessDashboard from "./mindfulness";
 import { ToastContainer } from "react-toastify";
 import Notification from "@/components/Notification";
+import GratitudeJournal from "@/components/GratitudeJournal";
 
 export default async function Dashboard() {
     const session = await getServerSession(authOptions);
@@ -40,6 +41,7 @@ export default async function Dashboard() {
       </div>
       <MoodTrendspro/>
       <MindfulnessDashboard/>
+      <GratitudeJournal />
       {/* <Link href="/dashboard/mindfulness">
           <div className="p-4 bg-green-100 rounded-lg shadow cursor-pointer hover:bg-green-200">
             <h2 className="text-xl font-semibold">Mindfulness Exercises</h2>
