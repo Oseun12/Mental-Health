@@ -14,14 +14,15 @@ const MoodTrends = () => {
     const fetchMoods = async () => {
       try {
         const response = await fetch("/api/mood/trends");
+        if (!response.ok) throw new Error("Failed to fetch");
         const data = await response.json();
-        setMoods(data.moods);
-        setAverageSentiment(data.averageSentiment);
+        setMoods(Array.isArray(data.moods) ? data.moods : []);
+        setAverageSentiment(data.averageSentiment || 0);
       } catch (error) {
         console.error("Failed to fetch mood trends", error);
+        setMoods([]); // Ensure moods is always an array
       }
     };
-
     fetchMoods();
   }, []);
 

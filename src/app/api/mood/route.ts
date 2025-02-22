@@ -3,7 +3,7 @@ import Sentiment from "sentiment";
 import Mood from "@/models/Mood"; 
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]";
+import { authOptions } from "@/utils/auth-options";
 
 export async function POST(req: NextRequest) {
     try {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
 
-export async function GET() {
+  export async function GET() {
     try {
       await connectViaMongoose();
       const session = await getServerSession(authOptions);
@@ -46,14 +46,20 @@ export async function GET() {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
   
-      const moods = await Mood.find({ userId: session.user.id }).sort({ createdAt: -1 });
+      const moods = (await Mood.find({ userId: session.user.id }).sort({ createdAt: -1 })) || [];
+  
+      console.log("Fetched Moods:", moods); // Debugging: See what’s returned
   
       const averageSentiment =
-      moods.length > 0 ? moods.reduce((sum, m) => sum + (m.sentimentScore || 0), 0) / moods.length : 0;
-
-      return NextResponse.json({ averageSentiment, moods }, { status: 200 });
+        moods.length > 0
+          ? moods.reduce((sum, m) => sum + (m.sentimentScore || 0), 0) / moods.length
+          : 0;
+  
+      return NextResponse.json({ averageSentiment, moods: Array.isArray(moods) ? moods : [] }, { status: 200 });
     } catch (error) {
+      console.error("Mood Fetch Error:", error); // Debugging
       return NextResponse.json({ message: "Failed to fetch moods", error }, { status: 500 });
     }
   }
+  
   

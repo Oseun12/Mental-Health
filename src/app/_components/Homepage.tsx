@@ -5,6 +5,8 @@ import Introduction from './Introduction'
 import Introduction2 from './Introduction2'
 import Popup from './Popup'
 import TestimonialSlider from './TestimonialSlider'
+import Faq from './Faq'
+import Footer from './Footer'
 
 function Homepage() {
   return (
@@ -15,6 +17,8 @@ function Homepage() {
         <Introduction2/>
         <Popup/>
         <TestimonialSlider/>
+        <Faq/>
+        <Footer/>
     </div>
   )
 }

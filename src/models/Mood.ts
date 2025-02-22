@@ -5,7 +5,6 @@ const MoodSchema = new Schema({
         type: String,
         required: true
     },
-
     mood : {
         type: String,
         required: true
@@ -25,6 +24,6 @@ const MoodSchema = new Schema({
     timestamps: true
 });
 
-const Mood = models.Mood || mongoose.model('User', MoodSchema);
+const Mood = models.Mood || mongoose.model('Mood', MoodSchema);
 
 export default Mood;

@@ -32,7 +32,7 @@ function Hero() {
 
           <div className="mt-8 flex flex-wrap gap-4">
             <a
-              href="#"
+              href="/signup"
               className="block  rounded-sm bg-rose-600 px-12 py-3 text-sm font-medium text-white shadow-sm hover:bg-rose-700 sm:w-auto"
             >
               Get Started

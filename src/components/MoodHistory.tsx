@@ -19,20 +19,28 @@ export default function MoodHistory() {
     },
   });
 
+  console.log("MoodHistory data:", data); 
+
   if (isLoading) return <p>Loading moods...</p>;
   if (error) return <p>Error loading moods.</p>;
+
+  const moodsArray = Array.isArray(data) ? data : [];
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-2">Your Mood History</h2>
-      <ul>
-        {data?.map((entry: MoodEntry) => (
-          <li key={entry._id} className="p-2 border-b">
-            <strong>{entry.mood}</strong> - {new Date(entry.createdAt).toLocaleDateString()}
-            {entry.note && <p className="text-gray-600">{entry.note}</p>}
-          </li>
-        ))}
-      </ul>
+      {moodsArray.length === 0 ? (
+        <p>No mood check-ins yet.</p>
+      ) : (
+        <ul>
+          {moodsArray.map((entry: MoodEntry) => (
+            <li key={entry._id} className="p-2 border-b">
+              <strong>{entry.mood}</strong> - {new Date(entry.createdAt).toLocaleDateString()}
+              {entry.note && <p className="text-gray-600">{entry.note}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

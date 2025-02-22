@@ -1,11 +1,22 @@
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
+
+// const connectViaMongoose = async () => {
+//     if (mongoose.connection.readyState === 1) {
+//         return;
+//     };
+//     return mongoose.connect(process.env.MONGODB_URI!);
+// }
+
+// export default connectViaMongoose;
+
+import mongoose from "mongoose";
 
 const connectViaMongoose = async () => {
     if (mongoose.connection.readyState === 1) {
-        return;
-    };
-    return mongoose.connect(process.env.MONGODB_URI!);
-}
+        return; 
+    }
+    await mongoose.connect(process.env.MONGODB_URI!);
+};
 
 export default connectViaMongoose;

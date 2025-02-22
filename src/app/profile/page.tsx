@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import ProfileJournalList from "@/components/ProfileJournalList";
 import MoodTracker from "@/components/MoodTracker";
+import { authOptions } from "@/utils/auth-options";
 
-import { authOptions } from "../api/auth/[...nextauth]";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);

@@ -18,7 +18,7 @@ export default function AuthButton() {
           className="px-4 py-2 bg-rose-600 text-white rounded"
           onClick={() => signIn("google")}
         >
-          Login with Google
+          Get Started!
         </button>
       )}
     </div>
