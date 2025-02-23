@@ -21,14 +21,14 @@ export default function SigninPage() {
         redirect: false,
         email: data.email,
         password: data.password,
-        callbackUrl: "/dashboard",
+        callbackUrl: "/dashboard/dashboard",
       });
 
       if (res?.error) {
         throw new Error("Invalid email or password");
       }
 
-      router.push("/dashboard"); 
+      router.push("/dashboard/dashboard"); 
       router.refresh()
     } catch (err) {
       setError((err as Error).message);

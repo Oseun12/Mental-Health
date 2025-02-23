@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc"; // Google Icon
 
 export default function SignupPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -84,6 +86,22 @@ export default function SignupPage() {
         <p className="mt-4 text-center">
           Already have an account? <Link href="/signin" className="text-blue-600">Sign in</Link>
         </p>
+
+        <span className="flex items-center mt-6 text-gray-400">
+          <span className="h-px flex-1 bg-gray-400"></span>
+          <span className="shrink-0 px-6">OR</span>
+          <span className="h-px flex-1 bg-gray-400"></span>
+        </span>
+        
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/dashboard/dashboard" })}
+            className="flex items-center gap-3 border p-3 rounded-md w-full justify-center hover:bg-gray-200 transition"
+          >
+            <FcGoogle size={24} /> 
+            <span>Continue with Google</span>
+          </button>
+        </div>
       </div>
     </div>
   );

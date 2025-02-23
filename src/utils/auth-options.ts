@@ -1,10 +1,11 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google"; // Import Google Provider
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import connectViaMongoose from "@/lib/db";
-import { JWT } from "next-auth/jwt";
-import { Session } from "next-auth";
+// import { JWT } from "next-auth/jwt";
+// import { Session } from "next-auth";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -34,7 +35,14 @@ export const authOptions: AuthOptions = {
         return { id: user._id.toString(), name: user.name, email: user.email };
       },
     }),
+
+    // Google Provider
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -49,7 +57,7 @@ export const authOptions: AuthOptions = {
       return session;
     },
   },
-  
+
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" as const },
 };
