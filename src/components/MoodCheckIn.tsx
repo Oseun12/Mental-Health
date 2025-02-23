@@ -3,8 +3,15 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
-const moods = ["Happy 😊", "Sad 😢", "Neutral 😐", "Stressed 😖", "Excited 🤩"];
+const moods = [
+  { label: "Happy 😊", color: "bg-green-500" },
+  { label: "Sad 😢", color: "bg-blue-400" },
+  { label: "Neutral 😐", color: "bg-gray-400" },
+  { label: "Stressed 😖", color: "bg-red-400" },
+  { label: "Excited 🤩", color: "bg-yellow-400" },
+];
 
 export default function MoodCheckIn() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -33,28 +40,57 @@ export default function MoodCheckIn() {
   });
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-2">How are you feeling today?</h2>
-      <div className="flex gap-2 mb-3">
-        {moods.map((mood) => (
-          <button
-            key={mood}
-            className={`p-2 rounded-md ${selectedMood === mood ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-            onClick={() => setSelectedMood(mood)}
-          >
-            {mood}
-          </button>
-        ))}
-      </div>
-      <textarea
-        className="w-full p-2 border rounded-md"
-        placeholder="Add a note (optional)..."
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-      />
-      <Button className="mt-3 w-full" onClick={() => mutation.mutate()} disabled={!selectedMood || mutation.isPending}>
-        {mutation.isPending ? "Submitting..." : "Submit Mood"}
-      </Button>
+    <div className="flex justify-center  mt-20 items-center h-[600] bg-gradient-to-r from-blue-200 to-purple-300 p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9 }}
+        className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6"
+      >
+        {/* Header */}
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+          How are you feeling today? 🌿
+        </h2>
+        <p className="text-gray-600 text-center mb-6">
+          Your emotions matter. Select your mood and add a note if you'd like. 🌟
+        </p>
+
+        {/* Mood Selection */}
+        <div className="flex justify-center gap-3 flex-wrap mb-5">
+          {moods.map(({ label, color }) => (
+            <motion.button
+              key={label}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className={`px-4 py-2 rounded-lg text-white font-semibold shadow-md transition-all
+                ${selectedMood === label ? `${color} ring-4 ring-opacity-50` : "bg-gray-300 hover:bg-gray-400"}
+              `}
+              onClick={() => setSelectedMood(label)}
+            >
+              {label}
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Note Input */}
+        <textarea
+          className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 outline-none mb-4"
+          placeholder="Write about your day... (Optional)"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+
+        {/* Submit Button */}
+        <Button
+          className={`w-full py-3 text-lg font-semibold rounded-lg shadow-lg transition-all ${
+            selectedMood ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-gray-300 cursor-not-allowed"
+          }`}
+          onClick={() => mutation.mutate()}
+          disabled={!selectedMood || mutation.isPending}
+        >
+          {mutation.isPending ? "Submitting..." : "Submit Mood"}
+        </Button>
+      </motion.div>
     </div>
   );
 }

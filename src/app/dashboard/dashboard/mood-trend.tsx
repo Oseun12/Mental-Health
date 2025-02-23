@@ -24,16 +24,15 @@ const moodColors: Record<string, string> = {
 };
 
 export default function MoodTrendsDashboard() {
-  const { data: moods, isLoading } = useQuery({
+  const { data: moods = [] } = useQuery({
     queryKey: ["moodTrends"],
     queryFn: async () => {
       const res = await fetch("/api/mood");
       return res.json();
     },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   });
-
-
-  if (isLoading) return <p>Loading mood trends...</p>;
 
   const moodsArray = Array.isArray(moods) ? moods : [];
 

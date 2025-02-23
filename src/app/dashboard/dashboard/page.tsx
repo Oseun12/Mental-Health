@@ -27,7 +27,7 @@ export default async function Dashboard() {
      
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
         <ToastContainer />
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Welcome to Your Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Welcome Bestie 👋</h1>
         <Notification />
         <MoodTrendsDashboard/>
         <MoodCheckIn />
