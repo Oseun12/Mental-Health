@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import MindfulnessDashboard from "../dashboard/mindfulness";
 
 export default function MindfulnessPage() {
   return (
@@ -10,12 +11,14 @@ export default function MindfulnessPage() {
         </p>
 
         <div className="space-y-4">
-          <Link href="/mindfulness/breathing">
+          <Link href="/dashboard/mindfulness/breathing">
             <Button className="w-full bg-blue-500 hover:bg-blue-600">Guided Breathing</Button>
           </Link>
-          <Link href="/mindfulness/relaxation">
+          <Link href="/dashboard/mindfulness/relaxation">
             <Button className="w-full bg-green-500 hover:bg-green-600">Relaxation Techniques</Button>
           </Link>
+          <MindfulnessDashboard/>
+          
         </div>
       </div>
   );

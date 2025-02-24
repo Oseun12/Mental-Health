@@ -40,12 +40,12 @@ export default function MoodCheckIn() {
   });
 
   return (
-    <div className="flex justify-center  mt-20 items-center h-[600] bg-gradient-to-r from-blue-200 to-purple-300 p-6">
+    <div className="flex justify-center mt-2 items-center h-[600] p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9 }}
-        className="w-full max-w-lg bg-white rounded-xl shadow-lg p-6"
+        className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-6"
       >
         {/* Header */}
         <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">

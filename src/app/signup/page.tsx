@@ -87,7 +87,7 @@ export default function SignupPage() {
           Already have an account? <Link href="/signin" className="text-blue-600">Sign in</Link>
         </p>
 
-        <span className="flex items-center mt-6 text-gray-400">
+        {/* <span className="flex items-center mt-6 text-gray-400">
           <span className="h-px flex-1 bg-gray-400"></span>
           <span className="shrink-0 px-6">OR</span>
           <span className="h-px flex-1 bg-gray-400"></span>
@@ -101,7 +101,7 @@ export default function SignupPage() {
             <FcGoogle size={24} /> 
             <span>Continue with Google</span>
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
