@@ -1,5 +1,4 @@
 import MoodCheckIn from "@/components/MoodCheckIn";
-import MoodHistory from "@/components/MoodHistory";
 import MoodTrendspro from "@/components/MoodTrends-upgrde";
 import { authOptions } from "@/utils/auth-options";
 import { getServerSession } from "next-auth";
@@ -28,7 +27,7 @@ export default async function Dashboard() {
       </h1>
       <DashboardHero/>
       <MoodCheckIn />
-      <MoodHistory />
+      {/* <MoodHistory /> */}
       <MoodTrendspro/>
       <GratitudeJournal />
       <Notification />
