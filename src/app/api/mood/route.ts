@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Mood is required" }, { status: 400 });
       }
   
-      // Analyze sentiment score
       const sentiment = new Sentiment();
       const analysis = sentiment.analyze(note || "");
       const sentimentScore = analysis.score; 
@@ -28,7 +27,7 @@ export async function POST(req: NextRequest) {
         userId: session.user.id,
         mood,
         note,
-        sentimentScore, // Save sentiment score
+        sentimentScore,
       });
   
       return NextResponse.json({ message: "Mood saved successfully", mood: newMood }, { status: 201 });
@@ -43,22 +42,78 @@ export async function POST(req: NextRequest) {
       await connectViaMongoose();
       const session = await getServerSession(authOptions);
       if (!session || !session.user) {
+        return NextResponse.json([], { status: 401 }); 
+      }
+  
+      const moods = await Mood.find({ userId: session.user.id }).sort({ createdAt: -1 }) || [];
+  
+      console.log("Fetched Moods:", moods);
+  
+      return NextResponse.json(moods, { status: 200 }); 
+    } catch (error) {
+      console.error("Mood Fetch Error:", error);
+      return NextResponse.json([], { status: 500 }); 
+    }
+  };
+
+  export async function PUT(req: NextRequest) {
+    try {
+      await connectViaMongoose();
+      const session = await getServerSession(authOptions);
+
+      if (!session || !session.user) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      }
+
+      const { id, mood, note } = await req.json();
+      if (!id || !mood) {
+        return NextResponse.json(
+          { message: "Mood ID and new mood are required" },
+          { status: 400 }
+        )
+      }
+
+      const updatedMood = await Mood.findOneAndUpdate(
+        { _id: id, userId: session.user.id },
+        { mood, note },
+        { new: true }
+      )
+
+      if (!updatedMood) {
+        return NextResponse.json({ error: "Mood not found or unauthorized" }, { status: 404 });
+      }
+  
+      return NextResponse.json({ message: "Mood updated successfully", mood: updatedMood }, { status: 200 });
+    
+    } catch (error) {
+      return NextResponse.json({ message: "Failed to update mood", error }, { status: 500 });
+    }
+  }
+  
+
+  export async function DELETE(req: NextRequest) {
+    try {
+      await connectViaMongoose();
+      const session = await getServerSession(authOptions);
+  
+      if (!session || !session.user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
   
-      const moods = (await Mood.find({ userId: session.user.id }).sort({ createdAt: -1 })) || [];
+      const { id } = await req.json();
+      if (!id) {
+        return NextResponse.json({ error: "Mood ID is required" }, { status: 400 });
+      }
   
-      console.log("Fetched Moods:", moods); // Debugging: See what’s returned
+      const deletedMood = await Mood.findOneAndDelete({ _id: id, userId: session.user.id });
   
-      const averageSentiment =
-        moods.length > 0
-          ? moods.reduce((sum, m) => sum + (m.sentimentScore || 0), 0) / moods.length
-          : 0;
+      if (!deletedMood) {
+        return NextResponse.json({ error: "Mood not found or unauthorized" }, { status: 404 });
+      }
   
-      return NextResponse.json({ averageSentiment, moods: Array.isArray(moods) ? moods : [] }, { status: 200 });
+      return NextResponse.json({ message: "Mood deleted successfully" }, { status: 200 });
     } catch (error) {
-      console.error("Mood Fetch Error:", error); // Debugging
-      return NextResponse.json({ message: "Failed to fetch moods", error }, { status: 500 });
+      return NextResponse.json({ message: "Failed to delete mood", error }, { status: 500 });
     }
   }
   

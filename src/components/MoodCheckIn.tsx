@@ -1,9 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { HiOutlineTrash } from "react-icons/hi2";
+import { RiEditLine } from "react-icons/ri";
+
+type MoodEntry = {
+  _id: string;
+  mood: string;
+  createdAt: string;
+  note?: string;
+};
 
 const moods = [
   { label: "Happy 😊", color: "bg-green-500" },
@@ -13,49 +23,96 @@ const moods = [
   { label: "Excited 🤩", color: "bg-yellow-400" },
 ];
 
-export default function MoodCheckIn() {
+export default function MoodTracker() {
+  const queryClient = useQueryClient();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [note, setNote] = useState("");
+  const [editingMood, setEditingMood] = useState<MoodEntry | null>(null);
 
+  // Fetch moods
+  const { data, error } = useQuery<MoodEntry[]>({
+    queryKey: ["moodHistory"],
+    queryFn: async (): Promise<MoodEntry[]> => {
+      const res = await fetch("/api/mood", { cache: "force-cache" });
+      if (!res.ok) throw new Error("Failed to fetch moods");
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const moodsArray = Array.isArray(data) ? data : [];
+
+  // Create or Update Mood
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/mood", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mood: selectedMood, note }),
+      const method = editingMood ? "PUT" : "POST";
+      const body = JSON.stringify({
+        id: editingMood?._id, // If editing, include ID
+        mood: selectedMood,
+        note,
       });
 
-      if (!res.ok) throw new Error("Failed to submit mood");
+      const res = await fetch("/api/mood", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body,
+      });
+
+      if (!res.ok) throw new Error(`Failed to ${editingMood ? "update" : "submit"} mood`);
 
       return res.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(["moodHistory"]);
       setSelectedMood(null);
       setNote("");
-      alert("Mood submitted successfully!");
-    },
-    onError: (error) => {
-      alert(error.message);
+      setEditingMood(null);
     },
   });
 
+  // Delete Mood
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch("/api/mood", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!res.ok) throw new Error("Failed to delete mood");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["moodHistory"]);
+    },
+  });
+
+  // Handle Edit
+  const handleEdit = (entry: MoodEntry) => {
+    setEditingMood(entry);
+    setSelectedMood(entry.mood);
+    setNote(entry.note || "");
+  };
+
+  // Handle Delete
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to delete this mood?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
   return (
-    <div className="flex justify-center mt-2 items-center h-[600] p-6">
+    <div className="p-4 bg-white rounded-lg shadow-md mx-auto max-w-screen-lg">
+      <h2 className="text-2xl font-semibold text-center mb-4">
+        {editingMood ? "Edit Mood Entry ✏️" : "How are you feeling today? 🌿"}
+      </h2>
+
+      {/* Mood Form */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9 }}
-        className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-6"
+        className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-6 mx-auto"
       >
-        {/* Header */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-          How are you feeling today? 🌿
-        </h2>
-        <p className="text-gray-600 text-center mb-6">
-          Your emotions matter. Select your mood and add a note if you'd like. 🌟
-        </p>
-
-        {/* Mood Selection */}
         <div className="flex justify-center gap-3 flex-wrap mb-5">
           {moods.map(({ label, color }) => (
             <motion.button
@@ -72,7 +129,6 @@ export default function MoodCheckIn() {
           ))}
         </div>
 
-        {/* Note Input */}
         <textarea
           className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 outline-none mb-4"
           placeholder="Write about your day... (Optional)"
@@ -80,7 +136,6 @@ export default function MoodCheckIn() {
           onChange={(e) => setNote(e.target.value)}
         />
 
-        {/* Submit Button */}
         <Button
           className={`w-full py-3 text-lg font-semibold rounded-lg shadow-lg transition-all ${
             selectedMood ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-gray-300 cursor-not-allowed"
@@ -88,9 +143,36 @@ export default function MoodCheckIn() {
           onClick={() => mutation.mutate()}
           disabled={!selectedMood || mutation.isPending}
         >
-          {mutation.isPending ? "Submitting..." : "Submit Mood"}
+          {mutation.isPending ? "Submitting..." : editingMood ? "Update Mood" : "Submit Mood"}
         </Button>
       </motion.div>
+
+      {/* Mood History */}
+      <h2 className="text-xl font-semibold mt-6 mb-2 text-center">Your Mood History</h2>
+
+      {error && <p className="text-red-500 text-center">Error loading moods.</p>}
+
+      {moodsArray.length === 0 ? (
+        <div className="flex flex-col items-center">
+          <Image src="/images/no-mood.png" alt="No moods available" width={200} height={200} className="mb-4" />
+          <p className="text-gray-500">No mood check-ins yet.</p>
+        </div>
+      ) : (
+        <ul>
+          {moodsArray.map((entry: MoodEntry) => (
+            <li key={entry._id} className="p-2 border-b flex justify-between">
+              <div>
+                <strong>{entry.mood}</strong> - {new Date(entry.createdAt).toLocaleDateString()}
+                {entry.note && <p className="text-gray-600">{entry.note}</p>}
+              </div>
+              <div className="flex gap-4">
+                <RiEditLine className="text-blue-500 cursor-pointer" onClick={() => handleEdit(entry)} />
+                <HiOutlineTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(entry._id)} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default async function Dashboard() {
     }
 
   return (
-    <div className="">
+    <div className="p-2">
       <ToastContainer />
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
         Welcome{" "}
