@@ -1,5 +1,4 @@
 import MoodCheckIn from "@/components/MoodCheckIn";
-import MoodTrendspro from "@/components/MoodTrends-upgrde";
 import { authOptions } from "@/utils/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
@@ -21,14 +20,14 @@ export default async function Dashboard() {
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
         Welcome{" "}
         <span className="bg-gradient-to-r from-purple-900 via-pink-500 to-blue-500 
-                        bg-clip-text text-transparent animate-gradient">
+          bg-clip-text text-transparent animate-gradient">
           {session.user?.name}
         </span> 👋
       </h1>
       <DashboardHero/>
       <MoodCheckIn />
       {/* <MoodHistory /> */}
-      <MoodTrendspro/>
+      {/* <MoodTrendspro/> */}
       <GratitudeJournal />
       <Notification />
     </div>

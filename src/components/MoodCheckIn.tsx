@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { RiEditLine } from "react-icons/ri";
+import { useSession } from "next-auth/react";
 
 type MoodEntry = {
   _id: string;
@@ -24,14 +25,16 @@ const moods = [
 ];
 
 export default function MoodTracker() {
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [editingMood, setEditingMood] = useState<MoodEntry | null>(null);
 
+
   // Fetch moods
   const { data, error } = useQuery<MoodEntry[]>({
-    queryKey: ["moodHistory"],
+    queryKey: ["moodHistory", session?.user?.id],
     queryFn: async (): Promise<MoodEntry[]> => {
       const res = await fetch("/api/mood", { cache: "force-cache" });
       if (!res.ok) throw new Error("Failed to fetch moods");
@@ -47,7 +50,7 @@ export default function MoodTracker() {
     mutationFn: async () => {
       const method = editingMood ? "PUT" : "POST";
       const body = JSON.stringify({
-        id: editingMood?._id, // If editing, include ID
+        id: editingMood?._id,
         mood: selectedMood,
         note,
       });
@@ -101,9 +104,14 @@ export default function MoodTracker() {
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md mx-auto max-w-screen-lg">
-      <h2 className="text-2xl font-semibold text-center mb-4">
-        {editingMood ? "Edit Mood Entry ✏️" : "How are you feeling today? 🌿"}
+    <div className="p-4 mt-20 bg-white rounded-lg shadow-md mx-auto max-w-screen-lg">
+      <h2 className="text-2xl font-semibold text-center mb-4 bg-gradient-to-r from-lime-900 via-black to-rose-500 
+          bg-clip-text text-transparent animate-gradient">
+        {editingMood
+            ? "Edit Mood Entry ✏️"
+            : `How are you feeling today`}  
+            <span className="text-3xl bg-gradient-to-r from-purple-900 via-pink-500 to-blue-500 
+          bg-clip-text text-transparent animate-gradient"> {session?.user?.name || ""}</span>    
       </h2>
 
       {/* Mood Form */}
@@ -130,7 +138,7 @@ export default function MoodTracker() {
         </div>
 
         <textarea
-          className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 outline-none mb-4"
+          className="w-full p-6 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 outline-none mb-4"
           placeholder="Write about your day... (Optional)"
           value={note}
           onChange={(e) => setNote(e.target.value)}

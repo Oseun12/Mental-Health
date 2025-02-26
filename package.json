@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.7",
     "keen-slider": "^6.8.6",
+    "localforage": "^1.10.0",
     "lucide-react": "^0.475.0",
     "mongoose": "^8.10.1",
     "next": "15.1.7",
