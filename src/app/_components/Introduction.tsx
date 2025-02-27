@@ -18,8 +18,8 @@ function Introduction() {
                 cope with life’s challenges, work productively, and contribute meaningfully to their communities.
             </p>
 
-            <div className='flex mx-auto max-w-screen-xl gap-10'>
-            <div className='w-1/2'>
+            <div className='md:flex mx-auto max-w-screen-xl gap-10'>
+                <div className='md:w-1/2'>
                     <h2 className="mt-8 text-2xl font-semibold text-gray-800">Why is Mental Health Important?</h2>
                     <p className="mt-4 text-lg text-gray-700 leading-relaxed">
                         Mental health is just as important as physical health. Poor mental health can lead to a range of issues, including 
@@ -37,7 +37,7 @@ function Introduction() {
                     </ul>
                 </div>
             
-                <div className='w-1/2'>
+                <div className='md:w-1/2'>
                     <h2 className="mt-8 text-2xl font-semibold text-gray-800">How to Maintain Good Mental Health</h2>
                     <p className="mt-4 text-lg text-gray-700 leading-relaxed">
                         Maintaining mental well-being requires intentional effort. Here are some ways to promote mental health:
