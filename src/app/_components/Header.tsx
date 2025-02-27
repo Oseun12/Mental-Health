@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -36,98 +37,48 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Navigation Links */}
-          <nav
-            className={`hidden md:flex items-center gap-8 ${
-              isScrolled ? "text-black" : "text-white"
-            }`}
-          >
-            {/* <Link
-              href="/about"
-              className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
+          {/* Navigation Links - Centered */}
+          <div className="flex-1 flex justify-center">
+            <nav
+              className={`hidden md:flex items-center gap-8 ${
+                isScrolled ? "text-black" : "text-white"
+              }`}
             >
-              About us
-            </Link> */}
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              <Link
+                href="#about"
                 className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
               >
-                About us
-                <i className={`bi ${isDropdownOpen ? "bi-chevron-up" : "bi-chevron-down"} ml-2 items-center text-sm`}></i>
-              </button>
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
-                  <Link
-                    href="/about"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    History
-                  </Link>
-                  {/* <Link
-                    href="/offers"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Our Products
-                  </Link> */}
-                </div>
-              )}
-            </div>
-            <Link
-              href="/offers"
-              className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
-            >
-              Products
-            </Link>
-            <Link
-              href="/services"
-              className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
-            >
-              Services
-            </Link>
-            <Link
-              href="/contact"
-              className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
-            >
-              Contact us
-            </Link>
-          </nav>
+                About
+              </Link>
+              <Link
+                href="#intro"
+                className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
+              >
+                Introduction
+              </Link>
+              <Link
+                href="#faq"
+                className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
+              >
+                FAQ
+              </Link>
+              <Link
+                href="/contact"
+                className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
+              >
+                Contact us
+              </Link>
+            </nav>
+          </div>
 
-          {/* Social Media Icons */}
-          <div className="hidden md:flex items-center gap-4">
-            <a
-              href="https://www.facebook.com/brandbuild.ng"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="facebook"
-              className={`transition-colors duration-300 hover:text-orange-500 ${
-                isScrolled ? "text-black" : "text-black"
-              }`}
+          {/* Signup / Get Started Button - Right-Aligned */}
+          <div className="hidden md:flex">
+            <Link
+              href="/signup"
+              className="bg-rose-600 text-white px-6 py-2 rounded-sm text-base font-medium transition-all duration-300 hover:bg-rose-800"
             >
-              <i className="bi bi-facebook text-xl"></i>
-            </a>
-            <a
-              href="https://www.instagram.com/brandbuild.ng"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="instagram"
-              className={`transition-colors duration-300 hover:text-orange-500 ${
-                isScrolled ? "text-black" : "text-black"
-              }`}
-            >
-              <i className="bi bi-instagram text-xl"></i>
-            </a>
-            <a
-              href="https://api.whatsapp.com/send?phone=+2349038940088"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="whatsapp"
-              className={`transition-colors duration-300 hover:text-orange-500 ${
-                isScrolled ? "text-black" : "text-black"
-              }`}
-            >
-              <i className="bi bi-whatsapp text-xl"></i>
-            </a>
+              Get Started
+            </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -138,19 +89,11 @@ const Header = () => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="menu"
           >
-            <i className={`bi ${isMenuOpen ? "bi-x" : "bi-list"}`}></i>
+            <i className={`bi ${isMenuOpen ? "bi-x" : "bi-list"} text-white`}></i>
           </button>
 
           {isMenuOpen && (
-            <nav
-              className={`absolute top-full left-0 w-full bg-white shadow-lg py-4 flex flex-col items-center gap-4 text-black`}
-            >
-              {/* <Link
-                className="text-base font-medium hover:text-gray-500"
-                href="/about"
-              >
-                About us
-              </Link> */}
+            <nav className="absolute top-full left-0 w-full bg-white shadow-lg py-4 flex flex-col items-center gap-4 text-black">
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -166,62 +109,25 @@ const Header = () => {
                     >
                       History
                     </Link>
-                    {/* <Link
-                      href="/offers"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      Seasonal Offers
-                    </Link> */}
                   </div>
                 )}
               </div>
-              <Link
-                className="text-base font-medium hover:text-gray-500"
-                href="/offers"
-              >
+              <Link className="text-base font-medium hover:text-gray-500" href="/offers">
                 Products
               </Link>
-              <Link
-                className="text-base font-medium hover:text-gray-500"
-                href="/services"
-              >
-               Services
+              <Link className="text-base font-medium hover:text-gray-500" href="/services">
+                Services
               </Link>
-              <Link
-                className="text-base font-medium hover:text-gray-500"
-                href="/contact"
-              >
+              <Link className="text-base font-medium hover:text-gray-500" href="/contact">
                 Contact us
               </Link>
-              <div className="flex items-center gap-4">
-                <Link
-                  href="https://www.facebook.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="facebook"
-                  className="text-black"
-                >
-                  <i className="bi bi-facebook text-xl"></i>
-                </Link>
-                <Link
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="instagram"
-                  className="text-black"
-                >
-                  <i className="bi bi-instagram text-xl"></i>
-                </Link>
-                <Link
-                    href="https://wa.me/2349038940088"
-                    target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="whatsapp"
-                  className="text-black"
-                >
-                  <i className="bi bi-whatsapp text-xl"></i>
-                </Link>
-              </div>
+              {/* Get Started button inside mobile menu */}
+              <Link
+                href="/signup"
+                className="bg-orange-500 text-white px-6 py-2 rounded-lg text-base font-medium transition-all duration-300 hover:bg-orange-600 mt-4"
+              >
+                Get Started
+              </Link>
             </nav>
           )}
         </div>
