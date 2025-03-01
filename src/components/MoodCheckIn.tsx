@@ -8,6 +8,7 @@ import Image from "next/image";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { RiEditLine } from "react-icons/ri";
 import { useSession } from "next-auth/react";
+import DeleteModal from "./DeleteModal";
 
 type MoodEntry = {
   _id: string;
@@ -30,18 +31,22 @@ export default function MoodTracker() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [editingMood, setEditingMood] = useState<MoodEntry | null>(null);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [moodToDelete, setMoodToDelete] = useState<string | null>(null);
+
 
 
   // Fetch moods
   const { data, error } = useQuery<MoodEntry[]>({
-    queryKey: ["moodHistory", session?.user?.id],
+    queryKey: ["moodHistory", session?.user?.id], 
     queryFn: async (): Promise<MoodEntry[]> => {
-      const res = await fetch("/api/mood", { cache: "force-cache" });
+      const res = await fetch(`/api/mood`);
       if (!res.ok) throw new Error("Failed to fetch moods");
       return res.json();
     },
     staleTime: 1000 * 60 * 5,
   });
+  
 
   const moodsArray = Array.isArray(data) ? data : [];
 
@@ -66,7 +71,11 @@ export default function MoodTracker() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["moodHistory"]);
+      if (session?.user?.id) {
+        queryClient.invalidateQueries(["moodHistory", session.user.id]);
+      } else {
+        queryClient.invalidateQueries(["moodHistory"]);
+      }
       setSelectedMood(null);
       setNote("");
       setEditingMood(null);
@@ -85,7 +94,11 @@ export default function MoodTracker() {
       if (!res.ok) throw new Error("Failed to delete mood");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["moodHistory"]);
+      if (session?.user?.id) {
+        queryClient.invalidateQueries(["moodHistory", session.user.id]);
+      } else {
+        queryClient.invalidateQueries(["moodHistory"]);
+      }
     },
   });
 
@@ -96,11 +109,17 @@ export default function MoodTracker() {
     setNote(entry.note || "");
   };
 
+  const confirmDelete = () => {
+    if (moodToDelete) {
+      deleteMutation.mutate(moodToDelete);
+      setDeleteModalOpen(false);
+    }
+  };
+
   // Handle Delete
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this mood?")) {
-      deleteMutation.mutate(id);
-    }
+    setMoodToDelete(id);
+    setDeleteModalOpen(true);  
   };
 
   return (
@@ -181,6 +200,12 @@ export default function MoodTracker() {
           ))}
         </ul>
       )}
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

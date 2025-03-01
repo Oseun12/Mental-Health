@@ -8,13 +8,19 @@ import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc"; // Google Icon
 import Image from "next/image";
 
+interface SignupFormData {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export default function SignupPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: SignupFormData) => {
     setLoading(true);
     setError("");
 
@@ -40,12 +46,18 @@ export default function SignupPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-screen-md p-6 bg-white rounded-lg shadow-md">
-        <div className="max-w-md mx-auto py-10 ">
-          <Image
-          src=''
-          alt=''
-          />
-          <h2 className="text-2xl font-semibold text-center ">Create an Account</h2>
+        <div className="max-w-md mx-auto py-10">
+          <div className="flex justify-center">
+            <Image
+              src="/image/logo.PNG"
+              alt="logo image"
+              width={160}
+              height={60}
+              priority
+              className="mx-auto"
+            />
+          </div>
+          <h2 className="text-2xl font-semibold text-center">Create an Account</h2>
 
           {error && <p className="text-red-500 text-center">{error}</p>}
 
@@ -57,7 +69,7 @@ export default function SignupPage() {
                 {...register("name", { required: "Name is required" })}
                 className="w-full p-2 border rounded-md mb-4"
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              {errors.name && <p className="text-red-500 text-sm">{String(errors.name.message)}</p>}
             </div>
 
             <div className="mt-3">
@@ -67,17 +79,17 @@ export default function SignupPage() {
                 {...register("email", { required: "Email is required" })}
                 className="w-full p-2 border rounded-md mb-4"
               />
-              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+              {errors.email && <p className="text-red-500 text-sm">{String(errors.email.message)}</p>}
             </div>
 
             <div className="mt-3">
               <label className="block text-sm font-medium">Password</label>
               <input
                 type="password"
-                {...register("password", { required: "Password is required", minLength: 6 })}
+                {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be at least 6 characters" } })}
                 className="w-full p-2 border rounded-md mb-4"
               />
-              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+              {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
             </div>
 
             <button

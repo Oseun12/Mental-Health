@@ -2,6 +2,7 @@ import React from 'react'
 import { GiBrain, GiSelfLove, GiMeditation, GiHealthIncrease  } from "react-icons/gi";
 import { RiPsychotherapyLine, RiUserCommunityLine } from "react-icons/ri";
 
+
 function Introduction2() {
   return (
     <section
