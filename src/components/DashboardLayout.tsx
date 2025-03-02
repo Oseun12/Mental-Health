@@ -8,10 +8,11 @@ import { FiSidebar } from "react-icons/fi";
 import { getSession, signOut } from "next-auth/react"; 
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { Session } from "next-auth";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const pathname = usePathname();
@@ -74,14 +75,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <NavItem href="/dashboard/profile" icon={<FaUserCircle className="text-transparent" />} label="Profile" pathname={pathname} />
                 </div>
               </div>
-
-              {/* 🚀 Logout Button */}
-              {/* <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="bg-outline border text-white px-4 py-2 rounded-md text-sm hover:bg-red-700 transition"
-              >
-                Logout
-              </button> */}
             </div>
           )}
 
@@ -98,7 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </button>
 
         {/* Page Content */}
-        <main className="p-6 lg:ml-64">{children}</main>
+        <main className="p-10 lg:ml-64">{children}</main>
       </div>
 
       {showConfirmModal && (
@@ -126,7 +119,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   );
 }
 
-function NavItem({ href, icon, label, pathname }) {
+type NavItemProps = {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  pathname: string;
+};
+
+function NavItem({ href, icon, label, pathname }: NavItemProps) {
   const isActive = pathname === href; 
 
   return (

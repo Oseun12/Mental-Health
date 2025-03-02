@@ -4,6 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
+interface MoodEntry {
+  _id: string;
+  mood: string;
+  createdAt: string;
+}
+
+
 export default function MoodTrendspro() {
   const { data: session } = useSession();
 
@@ -23,10 +30,11 @@ export default function MoodTrendspro() {
   
 
   // Convert moods into chart-friendly format
-  const moodData = moods.moods.map((mood: any) => ({
+  const moodData = moods.moods.map((mood: MoodEntry) => ({
     date: new Date(mood.createdAt).toLocaleDateString(),
     mood: getMoodScore(mood.mood),
   }));
+  
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">

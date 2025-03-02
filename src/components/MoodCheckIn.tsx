@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -33,22 +33,34 @@ export default function MoodTracker() {
   const [editingMood, setEditingMood] = useState<MoodEntry | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [moodToDelete, setMoodToDelete] = useState<string | null>(null);
+  const [localMoods, setLocalMoods] = useState<MoodEntry[]>([]);
 
-
+  // Load moods from localStorage **only on client**
+  useEffect(() => {
+    const storedMoods = localStorage.getItem("moodHistory");
+    if (storedMoods) {
+      setLocalMoods(JSON.parse(storedMoods));
+    }
+  }, []);
 
   // Fetch moods
-  const { data, error } = useQuery<MoodEntry[]>({
-    queryKey: ["moodHistory", session?.user?.id], 
+  const { data: moodsFromAPI } = useQuery<MoodEntry[]>({
+    queryKey: ["moodHistory", session?.user?.id],
     queryFn: async (): Promise<MoodEntry[]> => {
       const res = await fetch(`/api/mood`);
       if (!res.ok) throw new Error("Failed to fetch moods");
       return res.json();
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity, // Prevents automatic refetching
   });
-  
 
-  const moodsArray = Array.isArray(data) ? data : [];
+  // Sync API data with localStorage when data is available
+  useEffect(() => {
+    if (moodsFromAPI) {
+      localStorage.setItem("moodHistory", JSON.stringify(moodsFromAPI));
+      setLocalMoods(moodsFromAPI);
+    }
+  }, [moodsFromAPI]);
 
   // Create or Update Mood
   const mutation = useMutation({
@@ -71,18 +83,13 @@ export default function MoodTracker() {
       return res.json();
     },
     onSuccess: () => {
-      if (session?.user?.id) {
-        queryClient.invalidateQueries(["moodHistory", session.user.id]);
-      } else {
-        queryClient.invalidateQueries(["moodHistory"]);
-      }
+      queryClient.invalidateQueries({ queryKey: ["moodHistory", session?.user?.id] });
       setSelectedMood(null);
       setNote("");
       setEditingMood(null);
     },
   });
 
-  // Delete Mood
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch("/api/mood", {
@@ -94,11 +101,7 @@ export default function MoodTracker() {
       if (!res.ok) throw new Error("Failed to delete mood");
     },
     onSuccess: () => {
-      if (session?.user?.id) {
-        queryClient.invalidateQueries(["moodHistory", session.user.id]);
-      } else {
-        queryClient.invalidateQueries(["moodHistory"]);
-      }
+      queryClient.invalidateQueries({ queryKey: ["moodHistory", session?.user?.id] });
     },
   });
 
@@ -119,18 +122,18 @@ export default function MoodTracker() {
   // Handle Delete
   const handleDelete = (id: string) => {
     setMoodToDelete(id);
-    setDeleteModalOpen(true);  
+    setDeleteModalOpen(true);
   };
 
   return (
     <div className="p-4 mt-20 bg-white rounded-lg shadow-md mx-auto max-w-screen-lg">
       <h2 className="text-2xl font-semibold text-center mb-4 bg-gradient-to-r from-lime-900 via-black to-rose-500 
           bg-clip-text text-transparent animate-gradient">
-        {editingMood
-            ? "Edit Mood Entry ✏️"
-            : `How are you feeling today`}  
-            <span className="text-3xl bg-gradient-to-r from-purple-900 via-pink-500 to-blue-500 
-          bg-clip-text text-transparent animate-gradient"> {session?.user?.name || ""}</span>    
+        {editingMood ? "Edit Mood Entry ✏️" : `How are you feeling today`}  
+        <span className="text-3xl bg-gradient-to-r from-purple-900 via-pink-500 to-blue-500 
+          bg-clip-text text-transparent animate-gradient">
+          {session?.user?.name || ""}
+        </span>    
       </h2>
 
       {/* Mood Form */}
@@ -147,8 +150,7 @@ export default function MoodTracker() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               className={`px-4 py-2 rounded-lg text-white font-semibold shadow-md transition-all
-                ${selectedMood === label ? `${color} ring-4 ring-opacity-50` : "bg-gray-300 hover:bg-gray-400"}
-              `}
+                ${selectedMood === label ? `${color} ring-4 ring-opacity-50` : "bg-gray-300 hover:bg-gray-400"}`}
               onClick={() => setSelectedMood(label)}
             >
               {label}
@@ -177,16 +179,14 @@ export default function MoodTracker() {
       {/* Mood History */}
       <h2 className="text-xl font-semibold mt-6 mb-2 text-center">Your Mood History</h2>
 
-      {error && <p className="text-red-500 text-center">Error loading moods.</p>}
-
-      {moodsArray.length === 0 ? (
+      {localMoods.length === 0 ? (
         <div className="flex flex-col items-center">
           <Image src="/images/no-mood.png" alt="No moods available" width={200} height={200} className="mb-4" />
           <p className="text-gray-500">No mood check-ins yet.</p>
         </div>
       ) : (
         <ul>
-          {moodsArray.map((entry: MoodEntry) => (
+          {localMoods.map((entry: MoodEntry) => (
             <li key={entry._id} className="p-2 border-b flex justify-between">
               <div>
                 <strong>{entry.mood}</strong> - {new Date(entry.createdAt).toLocaleDateString()}
@@ -201,11 +201,7 @@ export default function MoodTracker() {
         </ul>
       )}
 
-      <DeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-      />
+      <DeleteModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} onConfirm={confirmDelete} />
     </div>
   );
 }

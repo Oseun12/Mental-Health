@@ -3,6 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
+interface ProfileJournalEntry {
+  _id: string;
+  entry: string;
+  createdAt: string;
+}
+
 export default function JournalList() {
   const { data: session } = useSession();
 
@@ -23,7 +29,7 @@ export default function JournalList() {
         <p>No journal entries yet.</p>
       ) : (
         <ul className="space-y-2">
-          {journals.journals.map((journal: any) => (
+          {journals.journals.map((journal: ProfileJournalEntry) => (
             <li key={journal._id} className="p-2 bg-gray-100 rounded">
               <p className="text-sm text-gray-600">{new Date(journal.createdAt).toLocaleDateString()}</p>
               <p>{journal.entry}</p>

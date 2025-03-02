@@ -44,16 +44,18 @@ export default function DashboardHero() {
   }, []);
 
   return (
-    <div className="relative w-full h-[500px] rounded-2xl flex items-center justify-center overflow-hidden">
+    <div className="relative w-full min-h-[400px] sm:min-h-[500px] rounded-2xl flex items-center justify-center overflow-hidden z-0">
       {/* Background Image */}
       <Image
         src="/image/hero-image2.webp"
         alt="Mental Health Awareness"
         layout="fill"
         objectFit="cover"
+        objectPosition="center"
         quality={100}
-        className="absolute inset-0 "
+        className="absolute inset-0 w-full h-full"
       />
+
 
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50"></div>

@@ -6,21 +6,32 @@ import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, To
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+interface Mood {
+  _id: string;
+  createdAt: string;
+  sentimentScore: number;
+}
+
+interface MoodResponse {
+  moods: Mood[];
+  averageSentiment: number;
+}
+
 const MoodTrends = () => {
-  const [moods, setMoods] = useState([]);
-  const [averageSentiment, setAverageSentiment] = useState(0);
+  const [moods, setMoods] = useState<Mood[]>([]);
+  const [averageSentiment, setAverageSentiment] = useState<number>(0);
 
   useEffect(() => {
     const fetchMoods = async () => {
       try {
         const response = await fetch("/api/mood/trends");
         if (!response.ok) throw new Error("Failed to fetch");
-        const data = await response.json();
+        const data: MoodResponse  = await response.json();
         setMoods(Array.isArray(data.moods) ? data.moods : []);
         setAverageSentiment(data.averageSentiment || 0);
       } catch (error) {
         console.error("Failed to fetch mood trends", error);
-        setMoods([]); // Ensure moods is always an array
+        setMoods([]); 
       }
     };
     fetchMoods();

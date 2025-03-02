@@ -5,6 +5,15 @@ import { useSession } from "next-auth/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 
+interface JournalEntry {
+  _id: string;
+  title: string;
+  content: string;
+  createdAt: Date; 
+  sentimentScore: number;
+}
+
+
 export default function JournalPage() {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
@@ -23,7 +32,7 @@ export default function JournalPage() {
 
   console.log("Fetched Journals:", journals);
 
-  const journalsArray = Array.isArray(journals?.journals) ? journals.journals : [];
+  const journalsArray: JournalEntry[] = Array.isArray(journals?.journals) ? journals.journals : [];
 
   const createJournal = useMutation({
     mutationFn: async () => {
@@ -34,7 +43,7 @@ export default function JournalPage() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["journals"]);
+      queryClient.invalidateQueries({ queryKey: ["journals"]});
       setTitle("");
       setContent("");
     },
@@ -79,7 +88,7 @@ export default function JournalPage() {
           {journalsArray.length === 0 ? (
             <p>No journal entries yet.</p>
           ) : (
-            journalsArray.map((journal: any) => (
+            journalsArray.map((journal: JournalEntry) => (
               <div key={journal._id} className="p-4 bg-gray-100 rounded shadow">
                 <h3 className="font-bold">{journal.title}</h3>
                 <p className="text-gray-700">{journal.content}</p>

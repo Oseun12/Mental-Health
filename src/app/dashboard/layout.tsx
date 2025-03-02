@@ -1,7 +1,11 @@
 import DashboardLayout from '@/components/DashboardLayout'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
-function layout({children}) {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+function layout({children}: LayoutProps) {
   return (
     <div>
         <DashboardLayout>

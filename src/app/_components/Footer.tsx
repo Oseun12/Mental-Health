@@ -9,7 +9,7 @@ function Footer() {
             <div className="h-[60px] w-[120px]">
             <Link href="/">
               <img
-                src="./assets/new-logo-brandbuild.png"
+                src="/image/logo.PNG"
                 alt="logo"
                 className="h-full w-full object-contain"
               />

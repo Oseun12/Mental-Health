@@ -1,19 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+interface GratitudeEntry {
+  _id: string;
+  content: string;
+}
 
 export default function GratitudeJournal() {
   const [content, setContent] = useState("");
   const queryClient = useQueryClient();
+  const [localEntries, setLocalEntries] = useState<GratitudeEntry[]>([]);
 
-  const { data: entries, isLoading } = useQuery({
+  const { data: entries } = useQuery<GratitudeEntry[]>({
     queryKey: ["gratitude"],
     queryFn: async () => {
       const res = await fetch("/api/gratitude");
       return res.json();
     },
+    staleTime: Infinity, // Prevent auto-refetching
   });
+
+  // Load cached data from localStorage **only on the client**
+  useEffect(() => {
+    const storedEntries = localStorage.getItem("gratitudeEntries");
+    if (storedEntries) {
+      setLocalEntries(JSON.parse(storedEntries));
+    }
+  }, []);
+
+  // Update localStorage when entries change
+  useEffect(() => {
+    if (entries) {
+      localStorage.setItem("gratitudeEntries", JSON.stringify(entries));
+      setLocalEntries(entries);
+    }
+  }, [entries]);
 
   const mutation = useMutation({
     mutationFn: async (newEntry: string) => {
@@ -24,7 +47,7 @@ export default function GratitudeJournal() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["gratitude"]);
+      queryClient.invalidateQueries({ queryKey: ["gratitude"] });
       setContent("");
     },
   });
@@ -32,9 +55,9 @@ export default function GratitudeJournal() {
   return (
     <div className="p-8 bg-gradient-to-r mx-auto max-w-screen-xl from-purple-400 to-blue-400 rounded-xl mt-20 shadow-xl">
       <h1 className="text-4xl font-extrabold mb-6 text-center text-white">Gratitude Journal</h1>
-      
+
       <p className="mb-6 text-white text-center text-lg italic">
-        "Gratitude turns what we have into enough."
+        &quot;Gratitude turns what we have into enough.&quot;
       </p>
 
       <div className="mb-6">
@@ -49,16 +72,16 @@ export default function GratitudeJournal() {
       <button
         className="w-full px-5 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-700 transition ease-in-out duration-300"
         onClick={() => mutation.mutate(content)}
-        disabled={mutation.isLoading}
+        disabled={mutation.status === "pending"}
       >
-        {mutation.isLoading ? "Saving..." : "Add Entry"}
+        {mutation.status === "pending" ? "Saving..." : "Add Entry"}
       </button>
 
       <div className="mt-6 space-y-4">
-        {isLoading ? (
-          <p className="text-center text-white">Loading entries...</p>
+        {localEntries.length === 0 ? (
+          <p className="text-center text-white">No entries yet. Start by adding one!</p>
         ) : (
-          entries.map((entry: any) => (
+          localEntries.map((entry: GratitudeEntry) => (
             <div key={entry._id} className="p-4 bg-white rounded-lg shadow-md">
               <p className="text-purple-700">{entry.content}</p>
             </div>
