@@ -38,7 +38,7 @@ export default function DashboardHero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % facts.length);
-    }, 5000); // Change fact every 5 seconds
+    }, 5000); 
 
     return () => clearInterval(interval);
   }, []);

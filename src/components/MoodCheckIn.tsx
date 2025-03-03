@@ -167,7 +167,7 @@ export default function MoodTracker() {
 
         <Button
           className={`w-full py-3 text-lg font-semibold rounded-lg shadow-lg transition-all ${
-            selectedMood ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-gray-300 cursor-not-allowed"
+            selectedMood ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-gray-800 cursor-not-allowed"
           }`}
           onClick={() => mutation.mutate()}
           disabled={!selectedMood || mutation.isPending}

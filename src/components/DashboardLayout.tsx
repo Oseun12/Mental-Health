@@ -37,7 +37,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:translate-x-0 `}>
           <h2 className="text-lg font-bold mb-10">Dashboard</h2>
-            
         
           <nav className="flex flex-col gap-4 p-4  text-white h-full">
           <NavItem href="/dashboard/dashboard" icon={<FaHome />} label="Home" pathname={pathname} />
