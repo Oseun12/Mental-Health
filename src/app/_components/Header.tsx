@@ -7,7 +7,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,12 +26,12 @@ const Header = () => {
       >
         <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
           {/* Logo */}
-          <div className="h-[60px] w-[120px]">
+          <div className="h-[80px] w-[120px]">
             <Link href="/">
               <img
-                src="./assets/new-logo-brandbuild.png"
+                src="./image/logo-removebg-preview.png"
                 alt="logo"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain "
               />
             </Link>
           </div>
@@ -94,40 +93,26 @@ const Header = () => {
 
           {isMenuOpen && (
             <nav className="absolute top-full left-0 w-full bg-white shadow-lg py-4 flex flex-col items-center gap-4 text-black">
-              <div className="relative">
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="text-base font-medium hover:text-gray-500"
-                >
-                  About Us
-                </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg">
-                    <Link
-                      href="/about"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      History
-                    </Link>
-                  </div>
-                )}
-              </div>
+              
               <Link className="text-base font-medium hover:text-gray-500" href="/offers">
-                Products
+                About
+              </Link>
+              <Link className="text-base font-medium hover:text-gray-500" href="/offers">
+                Introduction
               </Link>
               <Link className="text-base font-medium hover:text-gray-500" href="/services">
-                Services
+                FAQ
               </Link>
               <Link className="text-base font-medium hover:text-gray-500" href="/contact">
                 Contact us
               </Link>
               {/* Get Started button inside mobile menu */}
               <Link
-                href="/signup"
-                className="bg-orange-500 text-white px-6 py-2 rounded-lg text-base font-medium transition-all duration-300 hover:bg-orange-600 mt-4"
-              >
-                Get Started
-              </Link>
+              href="/signup"
+              className="bg-rose-600 text-white px-6 py-2 rounded-sm text-base font-medium transition-all duration-300 hover:bg-rose-800"
+            >
+              Get Started
+            </Link>
             </nav>
           )}
         </div>
