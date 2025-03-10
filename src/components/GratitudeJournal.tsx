@@ -54,29 +54,37 @@ export default function GratitudeJournal() {
   });
 
   const deleteMutation = useMutation({
+      mutationFn: async (id: string) => {
+        const res = await fetch("/api/gratitude", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+  
+        if (!res.ok) throw new Error("Failed to delete mood");
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["gratitude" ] });
+      },
+    });
+  
+
+  const updateMutation = useMutation({
     mutationFn: async (id: string) => {
-      await fetch(`/api/gratitude/${id}`, {
-        method: "DELETE",
+      const res = await fetch("/api/gratitude", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, content }),
       });
+
+      if (!res.ok) throw new Error("Failed to delete mood");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gratitude"] });
+      setEditingEntry(null); 
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: async (updatedEntry: GratitudeEntry) => {
-      await fetch(`/api/gratitude/${updatedEntry._id}`, {
-        method: "PUT",
-        body: JSON.stringify({ content: updatedEntry.content }),
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gratitude"] });
-      setEditingEntry(null);
-    },
-  });
 
   const handleEdit = (entry: GratitudeEntry) => {
     setEditingEntry(entry);
