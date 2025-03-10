@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { HiOutlineTrash } from "react-icons/hi2";
+import { RiEditLine } from "react-icons/ri";
 
 interface GratitudeEntry {
   _id: string;
@@ -10,6 +12,7 @@ interface GratitudeEntry {
 
 export default function GratitudeJournal() {
   const [content, setContent] = useState("");
+  const [editingEntry, setEditingEntry] = useState<GratitudeEntry | null>(null); 
   const queryClient = useQueryClient();
   const [localEntries, setLocalEntries] = useState<GratitudeEntry[]>([]);
 
@@ -19,10 +22,9 @@ export default function GratitudeJournal() {
       const res = await fetch("/api/gratitude");
       return res.json();
     },
-    staleTime: Infinity, // Prevent auto-refetching
+    staleTime: Infinity, 
   });
 
-  // Load cached data from localStorage **only on the client**
   useEffect(() => {
     const storedEntries = localStorage.getItem("gratitudeEntries");
     if (storedEntries) {
@@ -30,7 +32,6 @@ export default function GratitudeJournal() {
     }
   }, []);
 
-  // Update localStorage when entries change
   useEffect(() => {
     if (entries) {
       localStorage.setItem("gratitudeEntries", JSON.stringify(entries));
@@ -38,7 +39,7 @@ export default function GratitudeJournal() {
     }
   }, [entries]);
 
-  const mutation = useMutation({
+  const addMutation = useMutation({
     mutationFn: async (newEntry: string) => {
       await fetch("/api/gratitude", {
         method: "POST",
@@ -52,17 +53,59 @@ export default function GratitudeJournal() {
     },
   });
 
-  return (
-    <div className="p-8 bg-gradient-to-r mx-auto max-w-screen-xl from-purple-400 to-blue-400 rounded-xl mt-20 shadow-xl">
-      <h1 className="text-4xl font-extrabold mb-6 text-center text-white">Gratitude Journal</h1>
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await fetch(`/api/gratitude/${id}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gratitude"] });
+    },
+  });
 
-      <p className="mb-6 text-white text-center text-lg italic">
+  const updateMutation = useMutation({
+    mutationFn: async (updatedEntry: GratitudeEntry) => {
+      await fetch(`/api/gratitude/${updatedEntry._id}`, {
+        method: "PUT",
+        body: JSON.stringify({ content: updatedEntry.content }),
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gratitude"] });
+      setEditingEntry(null);
+    },
+  });
+
+  const handleEdit = (entry: GratitudeEntry) => {
+    setEditingEntry(entry);
+    setContent(entry.content);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
+  };
+
+  const handleUpdate = () => {
+    if (editingEntry) {
+      updateMutation.mutate({ ...editingEntry, content });
+    }
+  };
+
+  return (
+    <div className="p-8 bg-gradient-to-r mx-auto max-w-screen-xl from-gray-600 to-black rounded-xl mt-20 shadow-2xl">
+      <h1 className="text-4xl font-extrabold mb-6 text-center text-white text-gold-500">
+        Gratitude Journal
+      </h1>
+
+      <p className="mb-6 text-gold-300 text-center text-white text-lg italic">
         &quot;Gratitude turns what we have into enough.&quot;
       </p>
 
       <div className="mb-6">
         <textarea
-          className="w-full p-4 border border-purple-200 rounded-lg focus:outline-none focus:border-purple-500"
+          className="w-full p-4 border border-gold-300 rounded-lg focus:outline-none focus:border-gold-500 bg-gray-800 text-white placeholder-gray-400"
           placeholder="What are you grateful for today?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -70,20 +113,45 @@ export default function GratitudeJournal() {
       </div>
 
       <button
-        className="w-full px-5 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-700 transition ease-in-out duration-300"
-        onClick={() => mutation.mutate(content)}
-        disabled={mutation.status === "pending"}
+        className="w-full px-5 py-3 bg-white text-black font-semibold rounded-lg shadow-lg hover:bg-gold-600 transition ease-in-out duration-300"
+        onClick={() =>
+          editingEntry ? handleUpdate() : addMutation.mutate(content)
+        }
+        disabled={addMutation.status === "pending" || updateMutation.status === "pending"}
       >
-        {mutation.status === "pending" ? "Saving..." : "Add Entry"}
+        {editingEntry
+          ? updateMutation.status === "pending"
+            ? "Updating..."
+            : "Update Entry"
+          : addMutation.status === "pending"
+          ? "Saving..."
+          : "Add Entry"}
       </button>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-4 text-white">
         {localEntries.length === 0 ? (
-          <p className="text-center text-white">No entries yet. Start by adding one!</p>
+          <p className="text-center text-white text-gold-300">No entries yet. Start by adding one!</p>
         ) : (
           localEntries.map((entry: GratitudeEntry) => (
-            <div key={entry._id} className="p-4 bg-white rounded-lg shadow-md">
-              <p className="text-purple-700">{entry.content}</p>
+            <div
+              key={entry._id}
+              className="p-4 bg-gray-800 rounded-lg shadow-md flex justify-between items-center"
+            >
+              <p className="text-gold-200 flex-1">{entry.content}</p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => handleEdit(entry)}
+                  className="text-gold-400 hover:text-gold-500 transition ease-in-out duration-300"
+                >
+                  <RiEditLine size={18} />
+                </button>
+                <button
+                  onClick={() => handleDelete(entry._id)}
+                  className="text-red-400 hover:text-red-500 transition ease-in-out duration-300"
+                >
+                  <HiOutlineTrash size={18} />
+                </button>
+              </div>
             </div>
           ))
         )}

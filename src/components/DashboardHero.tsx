@@ -44,7 +44,7 @@ export default function DashboardHero() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-[400px] sm:min-h-[500px] rounded-2xl flex items-center justify-center overflow-hidden z-0">
+    <div className="relative w-full min-h-[400px] sm:min-h-[500px] rounded-2xl flex items-center justify-center overflow-hidden -z-20">
       {/* Background Image */}
       <Image
         src="/image/hero-image2.webp"

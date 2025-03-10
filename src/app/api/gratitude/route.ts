@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Gratitude from "@/models/Gratitude";
 import connectViaMongoose from "@/lib/db";
 import { authOptions } from "@/utils/auth-options";
@@ -28,4 +28,20 @@ export async function GET() {
   const gratitudeEntries = await Gratitude.find({ userId: session.user.id }).sort({ createdAt: -1 });
 
   return NextResponse.json(gratitudeEntries);
+}
+
+export async function PUT(req: NextRequest) {
+  await connectViaMongoose();
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: 400 }
+    )
+  }
+
+  const { id, content } = await req.json();
+  if(!id || !content) {
+    return NextResponse.json({ message: "All fields required" }, { status: 400 })
+  }
 }

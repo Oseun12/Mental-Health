@@ -35,7 +35,7 @@ export default function MoodTracker() {
   const [moodToDelete, setMoodToDelete] = useState<string | null>(null);
   const [localMoods, setLocalMoods] = useState<MoodEntry[]>([]);
 
-  // Load moods from localStorage **only on client**
+  // Load moods from localStorage 
   useEffect(() => {
     const storedMoods = localStorage.getItem("moodHistory");
     if (storedMoods) {
@@ -51,7 +51,7 @@ export default function MoodTracker() {
       if (!res.ok) throw new Error("Failed to fetch moods");
       return res.json();
     },
-    staleTime: Infinity, // Prevents automatic refetching
+    staleTime: Infinity,
   });
 
   // Sync API data with localStorage when data is available
