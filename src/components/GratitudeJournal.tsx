@@ -81,6 +81,7 @@ export default function GratitudeJournal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gratitude"] });
+      setContent("")
       setEditingEntry(null); 
     },
   });
@@ -97,7 +98,7 @@ export default function GratitudeJournal() {
 
   const handleUpdate = () => {
     if (editingEntry) {
-      updateMutation.mutate({ ...editingEntry, content });
+      updateMutation.mutate(editingEntry._id );
     }
   };
 
