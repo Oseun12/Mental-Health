@@ -31,17 +31,32 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  await connectViaMongoose();
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return NextResponse.json(
-      { message: "Unauthorized" },
-      { status: 400 }
-    )
-  }
+  try {
+    await connectViaMongoose();
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 400 }
+      )
+    }
 
-  const { id, content } = await req.json();
-  if(!id || !content) {
-    return NextResponse.json({ message: "All fields required" }, { status: 400 })
+    const { id, content } = await req.json();
+    if(!id || !content) {
+      return NextResponse.json({ message: "All fields required" }, { status: 400 })
+    }
+
+    const updatedGratitude = await Gratitude.findOneAndUpdate(
+      { _id: id, userId: session.user.id },
+      { content },
+      { new: true }
+    );
+
+    if (!updatedGratitude) {
+      return NextResponse.json({ message: "Gratitude not found" }, { status: 400 })
+    }
+    return NextResponse.json({ message: "Gratitude updated successfully" });
+  } catch (error) {
+    return NextResponse.json({ message: "Error updating Gratitude", error }, { status: 500 })
   }
 }
