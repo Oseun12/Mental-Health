@@ -61,7 +61,7 @@ export default function DashboardHero() {
       <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
       {/* Animated Text */}
-      <div className="relative z-10 text-center text-white max-w-3xl p-4">
+      <div className="relative z-10 text-center bg-white/20 backdrop-blur-lg rounded-lg text-white max-w-3xl p-4">
         <h1 className="text-4xl font-bold mb-4">Your Mental Health Matters 💙</h1>
         <AnimatePresence mode="wait">
           <motion.p

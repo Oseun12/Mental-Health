@@ -3,7 +3,7 @@ import { authOptions } from "@/utils/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
-import Notification from "@/components/Notification";
+// import Notification from "@/components/Notification";
 import GratitudeJournal from "@/components/GratitudeJournal";
 import DashboardHero from "@/components/DashboardHero";
 
@@ -29,7 +29,7 @@ export default async function Dashboard() {
       {/* <MoodHistory /> */}
       {/* <MoodTrendspro/> */}
       <GratitudeJournal />
-      <Notification />
+      {/* <Notification /> */}
     </div>
   );
 }

@@ -43,27 +43,27 @@ const Header = () => {
                 isScrolled ? "text-black" : "text-white"
               }`}
             >
-              <Link
+              {/* <Link
                 href="#about"
                 className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
               >
                 About
-              </Link>
+              </Link> */}
               <Link
-                href="#intro"
-                className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
+                href="#introduction"
+                className="text-base font-medium transition-colors duration-300 hover:text-gray-300"
               >
                 Introduction
               </Link>
               <Link
                 href="#faq"
-                className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
+                className="text-base font-medium transition-colors duration-300 hover:text-gray-300"
               >
                 FAQ
               </Link>
               <Link
                 href="/contact"
-                className="text-base font-medium transition-colors duration-300 hover:text-gray-500"
+                className="text-base font-medium transition-colors duration-300 hover:text-gray-300"
               >
                 Contact us
               </Link>
@@ -94,10 +94,10 @@ const Header = () => {
           {isMenuOpen && (
             <nav className="absolute top-full left-0 w-full bg-white shadow-lg py-4 flex flex-col items-center gap-4 text-black">
               
-              <Link className="text-base font-medium hover:text-gray-500" href="/offers">
+              {/* <Link className="text-base font-medium hover:text-gray-500" href="/">
                 About
-              </Link>
-              <Link className="text-base font-medium hover:text-gray-500" href="/offers">
+              </Link> */}
+              <Link className="text-base font-medium hover:text-gray-500" href="#introduction">
                 Introduction
               </Link>
               <Link className="text-base font-medium hover:text-gray-500" href="/services">

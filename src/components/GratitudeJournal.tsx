@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { RiEditLine } from "react-icons/ri";
+import DeleteModal from "./DeleteModal";
 
 interface GratitudeEntry {
   _id: string;
@@ -13,6 +14,8 @@ interface GratitudeEntry {
 export default function GratitudeJournal() {
   const [content, setContent] = useState("");
   const [editingEntry, setEditingEntry] = useState<GratitudeEntry | null>(null); 
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [moodToDelete, setMoodToDelete] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const [localEntries, setLocalEntries] = useState<GratitudeEntry[]>([]);
 
@@ -67,7 +70,13 @@ export default function GratitudeJournal() {
         queryClient.invalidateQueries({ queryKey: ["gratitude" ] });
       },
     });
-  
+    const confirmDelete = () => {
+      if (moodToDelete) {
+        deleteMutation.mutate(moodToDelete);
+        setDeleteModalOpen(false);
+      }
+    };
+
 
   const updateMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -93,7 +102,9 @@ export default function GratitudeJournal() {
   };
 
   const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
+    // deleteMutation.mutate(id);
+    setMoodToDelete(id);
+      setDeleteModalOpen(true);
   };
 
   const handleUpdate = () => {
@@ -103,7 +114,7 @@ export default function GratitudeJournal() {
   };
 
   return (
-    <div className="p-8 bg-gradient-to-r mx-auto max-w-screen-xl from-gray-600 to-black rounded-xl mt-20 shadow-2xl">
+    <div className="p-8 bg-gradient-to-r mx-auto max-w-screen-3xl from-gray-600 to-black rounded-xl mt-20 shadow-2xl">
       <h1 className="text-4xl font-extrabold mb-6 text-center text-white text-gold-500">
         Gratitude Journal
       </h1>
@@ -112,32 +123,34 @@ export default function GratitudeJournal() {
         &quot;Gratitude turns what we have into enough.&quot;
       </p>
 
-      <div className="mb-6">
+      <div className="mb-6 max-w-2xl mx-auto">
         <textarea
-          className="w-full p-4 border border-gold-300 rounded-lg focus:outline-none focus:border-gold-500 bg-gray-800 text-white placeholder-gray-400"
+          className="w-full p-4 border border-gold-300  rounded-lg focus:outline-none focus:border-gold-500 bg-gray-800 text-white placeholder-gray-400"
           placeholder="What are you grateful for today?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
       </div>
 
-      <button
-        className="w-full px-5 py-3 bg-white text-black font-semibold rounded-lg shadow-lg hover:bg-gold-600 transition ease-in-out duration-300"
-        onClick={() =>
-          editingEntry ? handleUpdate() : addMutation.mutate(content)
-        }
-        disabled={addMutation.status === "pending" || updateMutation.status === "pending"}
-      >
-        {editingEntry
-          ? updateMutation.status === "pending"
-            ? "Updating..."
-            : "Update Entry"
-          : addMutation.status === "pending"
-          ? "Saving..."
-          : "Add Entry"}
-      </button>
+      <div className="max-w-2xl mx-auto">
+        <button
+          className="w-full px-5  py-3 bg-white text-black font-semibold rounded-lg shadow-lg hover:bg-gold-600 transition ease-in-out duration-300"
+          onClick={() =>
+            editingEntry ? handleUpdate() : addMutation.mutate(content)
+          }
+          disabled={addMutation.status === "pending" || updateMutation.status === "pending"}
+        >
+          {editingEntry
+            ? updateMutation.status === "pending"
+              ? "Updating..."
+              : "Update Entry"
+            : addMutation.status === "pending"
+            ? "Saving..."
+            : "Add Entry"}
+        </button>
+      </div>
 
-      <div className="mt-6 space-y-4 text-white">
+      <div className="mt-6 space-y-4 text-white max-w-2xl mx-auto">
         {localEntries.length === 0 ? (
           <p className="text-center text-white text-gold-300">No entries yet. Start by adding one!</p>
         ) : (
@@ -165,6 +178,8 @@ export default function GratitudeJournal() {
           ))
         )}
       </div>
+        <DeleteModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} onConfirm={confirmDelete} />
+      
     </div>
   );
 }

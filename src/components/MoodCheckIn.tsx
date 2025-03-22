@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { RiEditLine } from "react-icons/ri";
 import { useSession } from "next-auth/react";
 import DeleteModal from "./DeleteModal";
+import Image from "next/image";
 
 type MoodEntry = {
   _id: string;
@@ -179,12 +179,14 @@ export default function MoodTracker() {
       {/* Mood History */}
       <h2 className="text-xl font-semibold mt-6 mb-2 text-center">Your Mood History</h2>
 
-      {localMoods.length === 0 ? (
+      {(localMoods?.length ?? 0) === 0 ? (
         <div className="flex flex-col items-center">
           {/* <Image src="/images/no-mood.png" alt="No moods available" width={200} height={200} className="mb-4" /> */}
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
-            <div className="h-32 rounded-lg bg-gray-500"></div>
-            <div className="h-32 rounded-lg bg-gray-500"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
+            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
+            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
+            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
           </div>
           <p className="text-gray-500">No mood check-ins yet.</p>
         </div>
