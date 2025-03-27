@@ -38,3 +38,34 @@ export async function GET() {
     return NextResponse.json({ message: "Failed to fetch journals", error }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    await connectViaMongoose();
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { id, title, content } = await req.json();
+    if (!id || !content) {
+      return NextResponse.json({ message: "All fields required" }, { status: 400 });
+    }
+
+    const updatedJournal = await Journal.findOneAndUpdate(
+      { _id: id, userId: session.user.id },
+      { title, content },
+      { new: true }
+    )
+
+    if (!updatedJournal) {
+      return NextResponse.json({ message: "Journal not found" }, { status: 404 });
+    }
+    return NextResponse.json({ message: "Journal updated successfully", updatedJournal });
+  } catch (error) {
+    return NextResponse.json({ message: "Error updating Journal", error }, { status: 500 });
+  }
+}

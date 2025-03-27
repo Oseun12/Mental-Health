@@ -181,14 +181,19 @@ export default function MoodTracker() {
 
       {(localMoods?.length ?? 0) === 0 ? (
         <div className="flex flex-col items-center">
-          {/* <Image src="/images/no-mood.png" alt="No moods available" width={200} height={200} className="mb-4" /> */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          <Image src="/image/Nothing_Here.jpg" 
+            alt="No moods available" 
+            width={600} 
+            height={200} 
+            className="mb-4 rounded-full" 
+          />
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:gap-8 animate-pulse">
             <div className="h-32 w-64 rounded bg-gray-300 border"></div>
             <div className="h-32 w-64 rounded bg-gray-300 border"></div>
-            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
-            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
-          </div>
-          <p className="text-gray-500">No mood check-ins yet.</p>
+            <div className="h-32 w-64 rounded bg-gray-300 border hidden"></div>
+            <div className="h-32 w-64 rounded bg-gray-300 border hidden"></div>
+          </div> */}
+          {/* <p className="text-gray-500">No mood check-ins yet.</p> */}
         </div>
       ) : (
         <ul>
