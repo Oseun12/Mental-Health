@@ -1,11 +1,11 @@
 import React from 'react'
-import MoodTrendsDashboard from '../dashboard/mood-trend'
+// import MoodTrendsDashboard from '../dashboard/mood-trend'
 import MoodTrends from '@/components/MoodTrends'
 
 function page() {
   return (
     <div>
-        <MoodTrendsDashboard/>
+        {/* <MoodTrendsDashboard/> */}
         <MoodTrends/>
     </div>
   )

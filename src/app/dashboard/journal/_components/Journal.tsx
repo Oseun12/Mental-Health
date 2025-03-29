@@ -1,6 +1,6 @@
 "use client";
 
-import {  useEffect, useState } from "react";
+import {  useState } from "react";
 import { useSession } from "next-auth/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -28,16 +28,28 @@ export default function JournalPage() {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const persister = createSyncStoragePersister({
+  //     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+  //   });
+
+  //   persistQueryClient({
+  //     queryClient,
+  //     persister,
+  //   });
+  // }, [queryClient]);
+
+  if (typeof window !== "undefined") {
     const persister = createSyncStoragePersister({
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      storage: window.localStorage,
     });
 
     persistQueryClient({
       queryClient,
       persister,
     });
-  }, [queryClient]);
+  }
+
 
   // const persister = createSyncStoragePersister({
   //   storage: window.localStorage,

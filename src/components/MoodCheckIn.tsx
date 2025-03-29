@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -35,7 +34,7 @@ export default function MoodTracker() {
   const [moodToDelete, setMoodToDelete] = useState<string | null>(null);
   const [localMoods, setLocalMoods] = useState<MoodEntry[]>([]);
 
-  // Load moods from localStorage 
+  // Load moods from localStorage on initial render
   useEffect(() => {
     const storedMoods = localStorage.getItem("moodHistory");
     if (storedMoods) {
@@ -43,7 +42,7 @@ export default function MoodTracker() {
     }
   }, []);
 
-  // Fetch moods
+  // Fetch moods from API
   const { data: moodsFromAPI } = useQuery<MoodEntry[]>({
     queryKey: ["moodHistory", session?.user?.id],
     queryFn: async (): Promise<MoodEntry[]> => {
@@ -51,10 +50,10 @@ export default function MoodTracker() {
       if (!res.ok) throw new Error("Failed to fetch moods");
       return res.json();
     },
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Sync API data with localStorage when data is available
+  // Sync API data with localStorage
   useEffect(() => {
     if (moodsFromAPI) {
       localStorage.setItem("moodHistory", JSON.stringify(moodsFromAPI));
@@ -125,32 +124,40 @@ export default function MoodTracker() {
     setDeleteModalOpen(true);
   };
 
+  // Group moods by date
+  const groupedMoods = localMoods.reduce((acc, mood) => {
+    const date = new Date(mood.createdAt).toLocaleDateString();
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(mood);
+    return acc;
+  }, {} as Record<string, MoodEntry[]>);
+
   return (
-    <div className="p-4 mt-20 bg-white rounded-lg shadow-md mx-auto max-w-screen-lg">
-      <h2 className="text-2xl font-semibold text-center mb-4 bg-gradient-to-r from-lime-900 via-black to-rose-500 
-          bg-clip-text text-transparent animate-gradient">
-        {editingMood ? "Edit Mood Entry ✏️" : `How are you feeling today`}  
-        <span className="text-3xl bg-gradient-to-r from-purple-900 via-pink-500 to-blue-500 
-          bg-clip-text text-transparent animate-gradient">
-          {session?.user?.name || ""}
-        </span>    
-      </h2>
+    <div className="p-4 mt-8 max-w-3xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          {editingMood ? "Edit Mood Entry" : "How Are You Feeling?"}
+        </h1>
+        <p className="text-gray-600">
+          {editingMood 
+            ? "Update your mood entry below" 
+            : "Select your current mood and add notes if you'd like"}
+        </p>
+      </div>
 
       {/* Mood Form */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9 }}
-        className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-6 mx-auto"
-      >
-        <div className="flex justify-center gap-3 flex-wrap mb-5">
+      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div className="flex flex-wrap justify-center gap-3 mb-6">
           {moods.map(({ label, color }) => (
             <motion.button
               key={label}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className={`px-4 py-2 rounded-lg text-white font-semibold shadow-md transition-all
-                ${selectedMood === label ? `${color} ring-4 ring-opacity-50` : "bg-gray-300 hover:bg-gray-400"}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-4 py-3 rounded-lg text-white font-medium transition-all
+                ${selectedMood === label ? `${color} ring-2 ring-offset-2 ring-opacity-50` : "bg-gray-200 hover:bg-gray-300 text-gray-700"}`}
               onClick={() => setSelectedMood(label)}
             >
               {label}
@@ -159,60 +166,98 @@ export default function MoodTracker() {
         </div>
 
         <textarea
-          className="w-full p-6 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 outline-none mb-4"
-          placeholder="Write about your day... (Optional)"
+          className="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none mb-4 min-h-[120px]"
+          placeholder="Add any notes about your day (optional)..."
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
 
         <Button
-          className={`w-full py-3 text-lg font-semibold rounded-lg shadow-lg transition-all ${
-            selectedMood ? "bg-blue-500 hover:bg-blue-600 text-white" : "bg-gray-800 cursor-not-allowed"
+          className={`w-full py-3 text-lg font-medium rounded-lg transition-all ${
+            selectedMood ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"
           }`}
           onClick={() => mutation.mutate()}
           disabled={!selectedMood || mutation.isPending}
         >
-          {mutation.isPending ? "Submitting..." : editingMood ? "Update Mood" : "Submit Mood"}
+          {mutation.isPending 
+            ? "Processing..." 
+            : editingMood 
+              ? "Update Mood" 
+              : "Save Mood"}
         </Button>
-      </motion.div>
+      </div>
 
       {/* Mood History */}
-      <h2 className="text-xl font-semibold mt-6 mb-2 text-center">Your Mood History</h2>
-
-      {(localMoods?.length ?? 0) === 0 ? (
-        <div className="flex flex-col items-center">
-          <Image src="/image/Nothing_Here.jpg" 
-            alt="No moods available" 
-            width={600} 
-            height={200} 
-            className="mb-4 rounded-full" 
-          />
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:gap-8 animate-pulse">
-            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
-            <div className="h-32 w-64 rounded bg-gray-300 border"></div>
-            <div className="h-32 w-64 rounded bg-gray-300 border hidden"></div>
-            <div className="h-32 w-64 rounded bg-gray-300 border hidden"></div>
-          </div> */}
-          {/* <p className="text-gray-500">No mood check-ins yet.</p> */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-xl font-semibold text-gray-800">Your Mood History</h2>
         </div>
-      ) : (
-        <ul>
-          {localMoods.map((entry: MoodEntry) => (
-            <li key={entry._id} className="p-2 border-b flex justify-between">
-              <div>
-                <strong>{entry.mood}</strong> - {new Date(entry.createdAt).toLocaleDateString()}
-                {entry.note && <p className="text-gray-600">{entry.note}</p>}
-              </div>
-              <div className="flex gap-4">
-                <RiEditLine className="text-blue-500 cursor-pointer" onClick={() => handleEdit(entry)} />
-                <HiOutlineTrash className="text-red-500 cursor-pointer" onClick={() => handleDelete(entry._id)} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
 
-      <DeleteModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} onConfirm={confirmDelete} />
+        {localMoods.length === 0 ? (
+          <div className="p-8 text-center">
+            <Image 
+              src="/image/Nothing_Here.jpg" 
+              alt="No moods available" 
+              width={400} 
+              height={200} 
+              className="mx-auto mb-4 rounded-lg" 
+            />
+            <p className="text-gray-500">No mood entries yet. Check in with yourself!</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {Object.entries(groupedMoods).map(([date, entries]) => (
+              <div key={date} className="p-4">
+                <h3 className="text-lg font-medium text-gray-700 mb-3">{date}</h3>
+                <div className="space-y-3">
+                  {entries.map((entry) => (
+                    <div key={entry._id} className="flex justify-between items-start p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-block w-3 h-3 rounded-full ${
+                            entry.mood.includes("Happy") ? "bg-green-500" :
+                            entry.mood.includes("Sad") ? "bg-blue-400" :
+                            entry.mood.includes("Neutral") ? "bg-gray-400" :
+                            entry.mood.includes("Stressed") ? "bg-red-400" :
+                            "bg-yellow-400"
+                          }`}></span>
+                          <span className="font-medium">{entry.mood}</span>
+                        </div>
+                        {entry.note && (
+                          <p className="text-gray-600 mt-1 text-sm">{entry.note}</p>
+                        )}
+                      </div>
+                      <div className="flex gap-3">
+                        <button 
+                          onClick={() => handleEdit(entry)}
+                          className="text-blue-500 hover:text-blue-700 transition-colors"
+                          aria-label="Edit"
+                        >
+                          <RiEditLine size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(entry._id)}
+                          className="text-red-500 hover:text-red-700 transition-colors"
+                          aria-label="Delete"
+                        >
+                          <HiOutlineTrash size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setDeleteModalOpen(false)} 
+        onConfirm={confirmDelete} 
+      />
     </div>
   );
 }
