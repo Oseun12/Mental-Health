@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,112 +21,111 @@ const facts = [
   "Unplugging from social media can improve mental well-being.",
   "Music therapy helps reduce anxiety and boost mood.",
   "Volunteering can improve happiness and mental health.",
-  "Crying is a natural stress reliever—don’t hold back.",
+  "Crying is a natural stress reliever—don't hold back.",
   "Nature and sunlight can boost serotonin levels.",
-  "It’s okay not to be okay—talk about it.",
-  "Your feelings are valid, even if others don't understand.",
-  "Kindness releases serotonin and reduces stress.",
-  "You are not alone—support is available.",
-  "Every small step counts toward healing.",
-  "Mental health matters every day, not just on awareness days.",
+  "It's okay not to be okay—talk about it.",
 ];
 
 export default function DashboardHero() {
   const [index, setIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prevIndex) => (prevIndex + 1) % facts.length);
-    }, 5000); 
+      if (!isHovered) {
+        setIndex((prevIndex) => (prevIndex + 1) % facts.length);
+      }
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isHovered]);
+
+  const nextFact = () => setIndex((prevIndex) => (prevIndex + 1) % facts.length);
+  const prevFact = () => setIndex((prevIndex) => (prevIndex - 1 + facts.length) % facts.length);
 
   return (
-    <div className="relative w-full min-h-[400px] sm:min-h-[500px] rounded-2xl flex items-center justify-center overflow-hidden -z-20">
-      {/* Background Image */}
-      <Image
-        src="/image/hero-image2.webp"
-        alt="Mental Health Awareness"
-        layout="fill"
-        objectFit="cover"
-        objectPosition="center"
-        quality={100}
-        className="absolute inset-0 w-full h-full"
-      />
+    <div className="relative w-full min-h-[400px] sm:min-h-[500px] rounded-2xl overflow-hidden -z-50 shadow-xl">
+      {/* Background Image with Gradient Overlay */}
+      <div className="absolute inset-0">
+        <Image
+          src="/image/hero-image2.webp"
+          alt="Mental Health Awareness"
+          fill
+          priority
+          className="object-cover object-center "
+          quality={100}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/50 to-indigo-900/20"></div>
+      </div>
 
+      {/* Content */}
+      <div className="relative z-10 h-full flex flex-col items-center justify-center p-6 text-center mt-20">
+        {/* Main Heading */}
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-4xl sm:text-5xl font-bold text-white mb-6 drop-shadow-lg"
+        >
+          Your Mental Health <span className="text-blue-300">Matters</span>
+        </motion.h1>
 
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-
-      {/* Animated Text */}
-      <div className="relative z-10 text-center bg-white/20 backdrop-blur-lg rounded-lg text-white max-w-3xl p-4">
-        <h1 className="text-4xl font-bold mb-4">Your Mental Health Matters 💙</h1>
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={index}
-            className="text-lg font-medium"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 1 }}
+        {/* Fact Container */}
+        <div 
+          className="max-w-3xl w-full relative"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {/* Navigation Arrows */}
+          <button 
+            onClick={prevFact}
+            className="absolute hidden md:block left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-8 p-2 text-white/70 hover:text-white transition-colors"
+            aria-label="Previous fact"
           >
-            {facts[index]}
-          </motion.p>
-        </AnimatePresence>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <button 
+            onClick={nextFact}
+            className="absolute hidden md:block right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-8 p-2 text-white/70 hover:text-white transition-colors"
+            aria-label="Next fact"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Animated Fact */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-white/20">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={index}
+                className="text-lg sm:text-xl font-medium text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+              >
+                {facts[index]}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Progress Dots */}
+        <div className="flex gap-2 mt-8">
+          {facts.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all ${i === index ? 'bg-white w-6' : 'bg-white/30'}`}
+              aria-label={`Go to fact ${i + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
-
-// import React from 'react'
-
-// function DashboardHero() {
-//   return (
-//     <section>
-//         <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
-//             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-//                 <div className="bg-gradient-to-r from-gray-500 to-purple-300 p-8 md:p-12 lg:px-16 lg:py-24">
-//                     <div className="mx-auto max-w-xl text-center">
-//                         <h2 className="text-2xl font-bold text-white md:text-3xl">
-//                         Lorem, ipsum dolor sit amet consectetur adipisicing elit
-//                         </h2>
-            
-//                         <p className="hidden text-white/90 sm:mt-4 sm:block">
-//                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Et, egestas tempus tellus etiam
-//                         sed. Quam a scelerisque amet ullamcorper eu enim et fermentum, augue. Aliquet amet
-//                         volutpat quisque ut interdum tincidunt duis.
-//                         </p>
-            
-//                         <div className="mt-4 md:mt-8">
-//                             <a
-//                                 href="#"
-//                                 className="inline-block rounded-sm border border-white bg-white px-12 py-3 text-sm font-medium text-blue-500 transition hover:bg-transparent hover:text-white focus:ring-3 focus:ring-yellow-400 focus:outline-hidden"
-//                             >
-//                                 Get Started Today
-//                             </a>
-//                         </div>
-//                     </div>
-//                 </div>
-        
-//                 <div className="grid grid-cols-2 gap-4 md:grid-cols-1 lg:grid-cols-2">
-//                     <img
-//                         alt=""
-//                         src="https://images.unsplash.com/photo-1621274790572-7c32596bc67f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=654&q=80"
-//                         className="h-40 w-full object-cover sm:h-56 md:h-full"
-//                     />
-            
-//                     <img
-//                         alt=""
-//                         src="https://images.unsplash.com/photo-1567168544813-cc03465b4fa8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
-//                         className="h-40 w-full md:hidden lg:block object-cover sm:h-56 md:h-full"
-//                     />
-//                 </div>
-//             </div>
-//         </div>
-//     </section>
-//   )
-// }
-
-// export default DashboardHero

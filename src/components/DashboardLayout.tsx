@@ -54,7 +54,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                onMouseLeave={() => setShowLogoutPopup(false)}
                onClick={() => setShowConfirmModal(true)}
                >
-                <div className="flex justify-between  items-center">
+                <div className="flex justify-between items-center">
                   <Image
                     src={session.user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.name || "User")}`}
                     alt="Profile Picture"
@@ -86,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="fixed top-4 left-4  text-grat-800 p-2 rounded-md lg:hidden">
-          {isSidebarOpen ? <FaTimes size={24} className="fixed left-52 text-white" /> : <FiSidebar size={24} className="-ml-4" />}
+          {isSidebarOpen ? <FaTimes size={24} className="fixed left-52 text-white" /> : <FiSidebar size={24} className="-ml-4 " />}
         </button>
 
         {/* Page Content */}
