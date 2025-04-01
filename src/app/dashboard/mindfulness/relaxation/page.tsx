@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function RelaxationExercise() {
   return (
-    <div className="min-h-screen bg-gradient-to-b flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-6">
       <div className="max-w-xl w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
         {/* Header with calming image */}
         <div 

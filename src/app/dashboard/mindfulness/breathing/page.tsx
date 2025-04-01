@@ -58,7 +58,7 @@ export default function BreathingExercise() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-5 to-indigo-50 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex flex-col items-center justify-center p-6">
       <div className="max-w-md w-full bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-8 text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Breathing Exercise</h1>
         <p className="text-gray-600 mb-8">Follow the rhythm to relax your mind and body</p>

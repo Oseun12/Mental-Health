@@ -2,12 +2,13 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { RiEditLine } from "react-icons/ri";
 import { useSession } from "next-auth/react";
 import DeleteModal from "./DeleteModal";
-import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FiSmile, FiMeh, FiFrown, FiZap, FiStar } from "react-icons/fi";
 
 type MoodEntry = {
   _id: string;
@@ -17,11 +18,11 @@ type MoodEntry = {
 };
 
 const moods = [
-  { label: "Happy 😊", color: "bg-green-500" },
-  { label: "Sad 😢", color: "bg-blue-400" },
-  { label: "Neutral 😐", color: "bg-gray-400" },
-  { label: "Stressed 😖", color: "bg-red-400" },
-  { label: "Excited 🤩", color: "bg-yellow-400" },
+  { label: "Happy", display: " Happy 😊", value: "Happy 😊", icon: <FiSmile />, color: "bg-green-100 text-green-600", border: "border-green-200" },
+  { label: "Sad", display: "Sad 😢", value: "Sad 😢", icon: <FiFrown />, color: "bg-blue-100 text-blue-600", border: "border-blue-200" },
+  { label: "Neutral", display: "Neutral 😐", value: "Neutral 😐", icon: <FiMeh />, color: "bg-gray-100 text-gray-600", border: "border-gray-200" },
+  { label: "Stressed", display: "Stressed 😖", value: "Stressed 😖", icon: <FiZap />, color: "bg-red-100 text-red-600", border: "border-red-200" },
+  { label: "Excited", display: "Excited 🤩", value: "Excited 🤩", icon: <FiStar />, color: "bg-yellow-100 text-yellow-600", border: "border-yellow-200" },
 ];
 
 export default function MoodTracker() {
@@ -43,7 +44,7 @@ export default function MoodTracker() {
   }, []);
 
   // Fetch moods from API
-  const { data: moodsFromAPI } = useQuery<MoodEntry[]>({
+  const { data: moodsFromAPI, isLoading } = useQuery<MoodEntry[]>({
     queryKey: ["moodHistory", session?.user?.id],
     queryFn: async (): Promise<MoodEntry[]> => {
       const res = await fetch(`/api/mood`);
@@ -65,6 +66,7 @@ export default function MoodTracker() {
   const mutation = useMutation({
     mutationFn: async () => {
       const method = editingMood ? "PUT" : "POST";
+      // const moodWithEmoji = moods.find(m => m.label === selectedMood)?.display || selectedMood;
       const body = JSON.stringify({
         id: editingMood?._id,
         mood: selectedMood,
@@ -107,7 +109,8 @@ export default function MoodTracker() {
   // Handle Edit
   const handleEdit = (entry: MoodEntry) => {
     setEditingMood(entry);
-    setSelectedMood(entry.mood);
+    const matchingMood = moods.find(m => entry.mood.includes(m.label));
+    setSelectedMood(matchingMood?.value || entry.mood);
     setNote(entry.note || "");
   };
 
@@ -134,114 +137,120 @@ export default function MoodTracker() {
     return acc;
   }, {} as Record<string, MoodEntry[]>);
 
+  const getMoodDetails = (moodLabel: string) => {
+    return moods.find(mood => mood.label === moodLabel.split(" ")[0]) || moods[2]; // Default to Neutral
+  };
+
   return (
-    <div className="p-4 mt-8 max-w-3xl mx-auto">
+    <div className="p-4 md:p-6 max-w-3xl mx-auto mt-20">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          {editingMood ? "Edit Mood Entry" : "How Are You Feeling?"}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="text-center mb-8"
+      >
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          {editingMood ? "Edit Mood Entry" : "How Are You Feeling Today?"}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 md:text-lg">
           {editingMood 
             ? "Update your mood entry below" 
-            : "Select your current mood and add notes if you'd like"}
+            : "Track your emotions and reflect on your day"}
         </p>
-      </div>
+      </motion.div>
 
       {/* Mood Form */}
-      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8"
+      >
+        <h2 className="text-xl font-semibold text-gray-800 mb-6">
+          {editingMood ? "Edit Mood" : "Select Your Mood"}
+        </h2>
+        
         <div className="flex flex-wrap justify-center gap-3 mb-6">
-          {moods.map(({ label, color }) => (
+          {moods.map((mood) => (
             <motion.button
-              key={label}
-              whileHover={{ scale: 1.05 }}
+              key={mood.value}
+              whileHover={{ y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className={`px-4 py-3 rounded-lg text-white font-medium transition-all
-                ${selectedMood === label ? `${color} ring-2 ring-offset-2 ring-opacity-50` : "bg-gray-200 hover:bg-gray-300 text-gray-700"}`}
-              onClick={() => setSelectedMood(label)}
+              className={`flex flex-col items-center justify-center px-4 py-3 rounded-lg font-medium transition-all
+                border ${mood.border} ${mood.color}
+                ${selectedMood === mood.value ? "ring-2 ring-offset-2 ring-opacity-50 scale-105" : "hover:shadow-sm"}`}
+              onClick={() => setSelectedMood(mood.value)}
             >
-              {label}
+              <span className="text-xl mb-1">{mood.icon}</span>
+              <span>{mood.label}</span>
             </motion.button>
           ))}
         </div>
 
-        <textarea
-          className="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none mb-4 min-h-[120px]"
-          placeholder="Add any notes about your day (optional)..."
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-        />
+        <div className="mb-6">
+          <label htmlFor="mood-note" className="block text-sm font-medium text-gray-700 mb-2">
+            Add notes about your day (optional)
+          </label>
+          <textarea
+            id="mood-note"
+            className="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none min-h-[120px] transition-all"
+            placeholder="Today I felt..."
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </div>
 
         <Button
           className={`w-full py-3 text-lg font-medium rounded-lg transition-all ${
-            selectedMood ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"
-          }`}
+            selectedMood ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" : "bg-gray-200 cursor-not-allowed text-gray-400"
+          } shadow-md`}
           onClick={() => mutation.mutate()}
           disabled={!selectedMood || mutation.isPending}
         >
-          {mutation.isPending 
-            ? "Processing..." 
-            : editingMood 
-              ? "Update Mood" 
-              : "Save Mood"}
+          {mutation.isPending ? (
+            <div className="flex items-center justify-center gap-2">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+              />
+              {editingMood ? "Updating..." : "Saving..."}
+            </div>
+          ) : editingMood ? (
+            "Update Mood"
+          ) : (
+            "Save Mood"
+          )}
         </Button>
-      </div>
+      </motion.div>
 
       {/* Mood History */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+        className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+      >
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-gray-800">Your Mood History</h2>
         </div>
 
-        {localMoods.length === 0 ? (
-          <div className="p-8 text-center">
-            <Image 
-              src="/image/Nothing_Here.jpg" 
-              alt="No moods available" 
-              width={400} 
-              height={200} 
-              className="mx-auto mb-4 rounded-lg" 
-            />
-            <p className="text-gray-500">No mood entries yet. Check in with yourself!</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {Object.entries(groupedMoods).map(([date, entries]) => (
-              <div key={date} className="p-4">
-                <h3 className="text-lg font-medium text-gray-700 mb-3">{date}</h3>
-                <div className="space-y-3">
-                  {entries.map((entry) => (
-                    <div key={entry._id} className="flex justify-between items-start p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className={`inline-block w-3 h-3 rounded-full ${
-                            entry.mood.includes("Happy") ? "bg-green-500" :
-                            entry.mood.includes("Sad") ? "bg-blue-400" :
-                            entry.mood.includes("Neutral") ? "bg-gray-400" :
-                            entry.mood.includes("Stressed") ? "bg-red-400" :
-                            "bg-yellow-400"
-                          }`}></span>
-                          <span className="font-medium">{entry.mood}</span>
-                        </div>
-                        {entry.note && (
-                          <p className="text-gray-600 mt-1 text-sm">{entry.note}</p>
-                        )}
+        {isLoading ? (
+          <div className="p-6 space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-6 w-32 rounded-lg" />
+                <div className="space-y-2">
+                  {[...Array(2)].map((_, j) => (
+                    <div key={j} className="flex justify-between items-center p-3">
+                      <div className="flex items-center space-x-3">
+                        <Skeleton className="h-4 w-4 rounded-full" />
+                        <Skeleton className="h-4 w-24 rounded-lg" />
                       </div>
-                      <div className="flex gap-3">
-                        <button 
-                          onClick={() => handleEdit(entry)}
-                          className="text-blue-500 hover:text-blue-700 transition-colors"
-                          aria-label="Edit"
-                        >
-                          <RiEditLine size={18} />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(entry._id)}
-                          className="text-red-500 hover:text-red-700 transition-colors"
-                          aria-label="Delete"
-                        >
-                          <HiOutlineTrash size={18} />
-                        </button>
+                      <div className="flex space-x-2">
+                        <Skeleton className="h-5 w-5 rounded-lg" />
+                        <Skeleton className="h-5 w-5 rounded-lg" />
                       </div>
                     </div>
                   ))}
@@ -249,8 +258,87 @@ export default function MoodTracker() {
               </div>
             ))}
           </div>
+        ) : localMoods.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="p-8 text-center"
+          >
+            <div className="mx-auto mb-6 w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+              <FiMeh size={48} />
+            </div>
+            <h3 className="text-xl font-medium text-gray-700 mb-2">No Moods Tracked Yet</h3>
+            <p className="text-gray-500 mb-4">Your mood history will appear here once you start tracking</p>
+            <Button 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="bg-black hover:bg-gray-600"
+            >
+              Track Your First Mood
+            </Button>
+          </motion.div>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            <AnimatePresence>
+              {Object.entries(groupedMoods).map(([date, entries]) => (
+                <motion.div 
+                  key={date}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="p-4"
+                >
+                  <h3 className="text-lg font-medium text-gray-700 mb-3">{date}</h3>
+                  <div className="space-y-3">
+                    {entries.map((entry) => {
+                      const moodDetails = getMoodDetails(entry.mood);
+                      return (
+                        <motion.div 
+                          key={entry._id}
+                          whileHover={{ scale: 1.01 }}
+                          className="flex justify-between items-start p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-100"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`mt-1 p-2 rounded-full ${moodDetails.color} ${moodDetails.border}`}>
+                              {moodDetails.icon}
+                            </div>
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                <span>{entry.mood.split(" ")[0]}</span>
+                                <span className="text-sm">{entry.mood.split(" ")[1]}</span>
+                              </div>
+                              {entry.note && (
+                                <p className="text-gray-600 mt-1 text-sm">{entry.note}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-3">
+                            <button 
+                              onClick={() => handleEdit(entry)}
+                              className="text-blue-500 hover:text-blue-700 transition-colors p-1 rounded-full hover:bg-blue-50"
+                              aria-label="Edit"
+                            >
+                              <RiEditLine size={18} />
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(entry._id)}
+                              className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
+                              aria-label="Delete"
+                            >
+                              <HiOutlineTrash size={18} />
+                            </button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Delete Confirmation Modal */}
       <DeleteModal 

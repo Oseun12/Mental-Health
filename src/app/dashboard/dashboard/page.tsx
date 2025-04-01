@@ -15,7 +15,7 @@ export default async function Dashboard() {
     }
 
   return (
-    <div className="p-2">
+    <div className="p-10">
       <ToastContainer />
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
         Welcome{" "}
@@ -28,7 +28,7 @@ export default async function Dashboard() {
       <MoodCheckIn />
       {/* <MoodHistory /> */}
       {/* <MoodTrendspro/> */}
-      <GratitudeJournal />
+      {/* <GratitudeJournal /> */}
       {/* <Notification /> */}
     </div>
   );

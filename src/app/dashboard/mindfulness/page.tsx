@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function MindfulnessPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-5 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl mx-auto">
         {/* Animated Header */}
         <div className="text-center mb-12 animate-fade-in">

@@ -90,7 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </button>
 
         {/* Page Content */}
-        <main className="p-10 lg:ml-64">{children}</main>
+        <main className="p- lg:ml-64">{children}</main>
       </div>
 
       {showConfirmModal && (

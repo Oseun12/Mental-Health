@@ -45,7 +45,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-screen-md p-6 bg-white rounded-lg shadow-md">
+      <div className="w-full max-w-screen-sm p-6 bg-white rounded-lg shadow-md">
         <div className="max-w-md mx-auto py-10">
           <div className="flex justify-center">
             <Image

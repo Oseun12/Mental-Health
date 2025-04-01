@@ -16,7 +16,13 @@ const MoodSchema = new Schema({
     mood : {
         type: String,
         required: true,
-        enum: Object.keys(MOOD_SCORES)
+        enum: Object.keys(MOOD_SCORES),
+        validate: {
+            validator: function(v: string) {
+              return v in MOOD_SCORES;
+            },
+            message: props => `${props.value} is not a valid mood`
+        }
     },
     note: {
         type: String
