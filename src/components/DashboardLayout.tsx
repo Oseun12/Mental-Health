@@ -30,6 +30,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     fetchSession();
   }, [router]);
 
+  // Function to generate initials from name
+  const getInitials = (name?: string | null) => {
+    if (!name) return "U";
+    const names = name.split(' ');
+    let initials = names[0].charAt(0).toUpperCase();
+    if (names.length > 1) {
+      initials += names[names.length - 1].charAt(0).toUpperCase();
+    }
+    return initials;
+  };
+
   return (
     <div className="flex h-screen">
       <aside
@@ -55,13 +66,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                onClick={() => setShowConfirmModal(true)}
                >
                 <div className="flex justify-between items-center">
-                  <Image
-                    src={session.user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.name || "User")}`}
-                    alt="Profile Picture"
-                    width={50}
-                    height={40}
-                    className="rounded-full"
-                  />
+                  {session.user?.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt="Profile Picture"
+                      width={50}
+                      height={50}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                      {getInitials(session.user?.name)}
+                    </div>
+                  )}
                 
                   {showLogoutPopup && (
                     <div className="absolute bottom-full mb-2 px-3 py-1 bg-gray-700 text-white text-sm rounded shadow-lg">
@@ -71,7 +88,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
               
                 <div>
-                  <NavItem href="/dashboard/profile" icon={<FaUserCircle className="text-transparent" />} label="Profile" pathname={pathname} />
+                  <NavItem href="" icon={<FaUserCircle className="text-transparent" />} label="Profile" pathname={pathname} />
                 </div>
               </div>
             </div>

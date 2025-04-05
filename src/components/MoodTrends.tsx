@@ -10,9 +10,12 @@ import {
   Title, 
   Tooltip, 
   Legend,
-  Filler
+  Filler,
+  ChartOptions,
+  TooltipItem
 } from "chart.js";
 import { FiTrendingUp, FiTrendingDown, FiActivity } from "react-icons/fi";
+import Link from "next/link";
 
 Chart.register(
   CategoryScale, 
@@ -104,7 +107,7 @@ const MoodTrends = () => {
     ],
   };
 
-  const chartOptions = {
+  const chartOptions: ChartOptions<"line"> = {
     responsive: true,
     plugins: {
       legend: {
@@ -115,12 +118,12 @@ const MoodTrends = () => {
         titleFont: {
           size: 14,
           weight: 'bold'
-        },
+        } as const,
         bodyFont: {
           size: 12
-        },
+        } as const,
         callbacks: {
-          label: (context: any) => {
+          label: (context: TooltipItem<"line">) => {
             return `Score: ${context.parsed.y}`;
           }
         }
@@ -166,8 +169,11 @@ const MoodTrends = () => {
             <span className="text-gray-500">Trend:</span>
             {getTrendIcon()}
             <span className="font-medium">
-              {stats.trend === 'up' ? 'Improving' : stats.trend === 'down' ? 'Declining' : 'Stable'}
+              {stats.trend === 'up' ? 'Improving' : 
+              stats.trend === 'down' ? 'Declining' : 
+              stats.trend === 'neutral' ? 'Stable' : 'No data'}
             </span>
+
           </div>
         </div>
 
@@ -199,20 +205,47 @@ const MoodTrends = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="text-xl font-semibold text-gray-800">Your Mood Timeline</h2>
+            {moods.length > 0 ? (
+              <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                <div className="p-6 border-b border-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-800">Your Mood Timeline</h2>
+                </div>
+                <div className="p-6 h-96">
+                  <Line data={chartData} options={chartOptions} />
+                </div>
               </div>
-              <div className="p-6 h-96">
-                <Line data={chartData} options={chartOptions} />
-              </div>
-            </div>
-
-            {moods.length === 0 && (
-              <div className="bg-white rounded-xl shadow-md p-8 text-center">
-                <p className="text-gray-500">No mood data available yet. Check back later!</p>
+            ) : (
+              <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+                <div className="p-8 text-center">
+                  <div className="mx-auto max-w-xs">
+                    <svg 
+                      className="w-24 h-24 mx-auto text-gray-300 mb-4" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={1.5} 
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" 
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">No mood data yet</h3>
+                  <p className="text-gray-500 mb-6">Start tracking your mood to discover patterns and insights</p>
+                  <Link href='/dashboard/dashboard'
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-900 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200"
+                  >
+                    <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Track Your First Mood
+                  </Link>
+                </div>
               </div>
             )}
+
           </>
         )}
       </div>

@@ -4,7 +4,6 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 // import Notification from "@/components/Notification";
-import GratitudeJournal from "@/components/GratitudeJournal";
 import DashboardHero from "@/components/DashboardHero";
 
 export default async function Dashboard() {
@@ -26,9 +25,6 @@ export default async function Dashboard() {
       </h1>
       <DashboardHero/>
       <MoodCheckIn />
-      {/* <MoodHistory /> */}
-      {/* <MoodTrendspro/> */}
-      {/* <GratitudeJournal /> */}
       {/* <Notification /> */}
     </div>
   );
