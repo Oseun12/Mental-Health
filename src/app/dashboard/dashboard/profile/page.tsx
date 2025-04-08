@@ -1,16 +1,74 @@
-import React from 'react'
+'use client'
 
-function page() {
+
+import React from 'react';
+
+function UnderDevelopment() {
   return (
-    <div className='mt-10'>
-      <div className='flex justify-center w-full'>
-        <img src="/image/work-in-progress.webp" alt="" />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
+      <div className="max-w-md w-full text-center">
+        {/* SVG Illustration */}
+        <div className="mx-auto w-64 h-64 mb-8">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="80" fill="#EFF6FF" />
+            <path 
+              d="M70 70 L130 70 L130 130 L70 130 Z" 
+              fill="none" 
+              stroke="#3B82F6" 
+              strokeWidth="8"
+            />
+            <path 
+              d="M85 85 L115 85 L115 115 L85 115 Z" 
+              fill="#3B82F6" 
+              opacity="0.2"
+            />
+            <path 
+              d="M70 70 L130 130 M70 130 L130 70" 
+              stroke="#EF4444" 
+              strokeWidth="4" 
+              strokeDasharray="8 4"
+            />
+            <circle cx="100" cy="100" r="30" fill="white" stroke="#3B82F6" strokeWidth="2" />
+            <text 
+              x="100" 
+              y="105" 
+              textAnchor="middle" 
+              fontSize="24" 
+              fontWeight="bold" 
+              fill="#3B82F6"
+            >
+              !
+            </text>
+          </svg>
+        </div>
+
+        {/* Message */}
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">Work in Progress</h1>
+        <p className="text-lg text-gray-600 mb-6">
+          This page is currently under development. Our team is working hard to bring you an amazing experience soon!
+        </p>
+        
+        {/* Progress indicator */}
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+          <div 
+            className="bg-blue-600 h-2.5 rounded-full animate-pulse" 
+            style={{ width: '60%' }}
+          ></div>
+        </div>
+
+        {/* Action button */}
+        <button
+          className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          onClick={() => window.history.back()}
+        >
+          Go Back
+        </button>
       </div>
     </div>
-  )
+  );
 }
 
-export default page
+export default UnderDevelopment;
 
 
 

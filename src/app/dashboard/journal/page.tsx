@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useQuery, useMutation, useQueryClient, QueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { RiEditLine, RiCloseLine } from "react-icons/ri";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { FiPlus } from "react-icons/fi";
 import { motion } from "framer-motion";
-
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 interface JournalEntry {
   _id: string;
   title: string;
@@ -16,66 +17,66 @@ interface JournalEntry {
   sentimentScore: number;
 }
 
-interface SyncStoragePersisterOptions {
-  storage?: Storage;
-  key?: string;
-  throttleTime?: number;
-}
+// interface SyncStoragePersisterOptions {
+//   storage?: Storage;
+//   key?: string;
+//   throttleTime?: number;
+// }
 
-interface PersistQueryClientOptions {
-  queryClient: QueryClient;
-  persister: ReturnType<typeof createSyncStoragePersister>;
-  maxAge?: number;
-  buster?: string;
-}
+// interface PersistQueryClientOptions {
+//   queryClient: QueryClient;
+//   persister: ReturnType<typeof createSyncStoragePersister>;
+//   maxAge?: number;
+//   buster?: string;
+// }
 
-function createSyncStoragePersister(options: SyncStoragePersisterOptions) {
-  const { storage = window.localStorage, key = 'REACT_QUERY_OFFLINE_CACHE'} = options;
+// function createSyncStoragePersister(options: SyncStoragePersisterOptions) {
+//   const { storage = window.localStorage, key = 'REACT_QUERY_OFFLINE_CACHE'} = options;
 
-  return {
-    restoreClient: async () => {
-      const cacheString = await storage.getItem(key);
-      if (!cacheString) return undefined;
-      try {
-        return JSON.parse(cacheString);
-      } catch (err) {
-        console.warn("Failed to parse persisted query cache:", err);
-        return undefined;
-      }
-    },
-    persistClient: async (client) => {
-      try {
-        const cacheString = JSON.stringify(client);
-        storage.setItem(key, cacheString);
-      } catch (err) {
-        console.warn("Failed to persist query cache:", err);
-      }
-    },
-    removeClient: async () => {
-      storage.removeItem(key);
-    },
-  };
-}
+//   return {
+//     restoreClient: async (): Promise<PersistedClient | undefined> => {
+//       const cacheString = await storage.getItem(key);
+//       if (!cacheString) return undefined;
+//       try {
+//         return JSON.parse(cacheString) as PersistedClient;
+//       } catch (err) {
+//         console.warn("Failed to parse persisted query cache:", err);
+//         return undefined;
+//       }
+//     },
+//     persistClient: async (client: PersistedClient): Promise<void> => {
+//       try {
+//         const cacheString = JSON.stringify(client);
+//         await storage.setItem(key, cacheString);
+//       } catch (err) {
+//         console.warn("Failed to persist query cache:", err);
+//       }
+//     },
+//     removeClient: async (): Promise<void> => {
+//       await storage.removeItem(key);
+//     },
+//   };
+// }
 
 
-function persistQueryClient({ queryClient, persister, maxAge = 1000 * 60 * 60 * 24 }: PersistQueryClientOptions) {
-  persister.restoreClient().then((cachedClient) => {
-    if (cachedClient?.timestamp) {
-      const isFresh = Date.now() - cachedClient.timestamp < maxAge;
-      if (isFresh && cachedClient.state) {
-        queryClient.resetQueries(cachedClient.state);
-      }
-    }
-  });
+// function persistQueryClient({ queryClient, persister, maxAge = 1000 * 60 * 60 * 24 }: PersistQueryClientOptions) {
+//   persister.restoreClient().then((cachedClient: PersistedClient | undefined) => {
+//     if (cachedClient?.timestamp) {
+//       const isFresh = Date.now() - cachedClient.timestamp < maxAge;
+//       if (isFresh && cachedClient.clientState) {  
+//         queryClient.setState(cachedClient.clientState);  
+//       }
+//     }
+//   });
 
-  queryClient.getQueryCache().subscribe(() => {
-    const client = {
-      timestamp: Date.now(),
-      state: queryClient.getQueryCache().getAll(),
-    };
-    persister.persistClient(client);
-  });
-}
+//   queryClient.getQueryCache().subscribe(() => {
+//     const client: PersistedClient = {
+//       timestamp: Date.now(),
+//       clientState: queryClient.getQueryCache().getAll(),  
+//     };
+//     persister.persistClient(client);
+//   });
+// }
 
 
 export default function JournalPage() {
@@ -90,18 +91,18 @@ export default function JournalPage() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-  if (typeof window === "undefined") return;
+ 
+    const persister = createSyncStoragePersister({
+      storage: window.localStorage,
+    });
 
-  const persister = createSyncStoragePersister({
-    storage: window.localStorage,
-  });
-
-  persistQueryClient({
-    queryClient,
-    persister,
-    maxAge: 1000 * 60 * 60 * 24, 
-  });
-}, [queryClient]);
+    // Persist the client
+    persistQueryClient({
+      queryClient,
+      persister,
+      maxAge: 1000 * 60 * 60 * 24, 
+    });
+  }, [queryClient]);
 
   
   const { data: journals, isLoading, isError, isFetching } = useQuery({

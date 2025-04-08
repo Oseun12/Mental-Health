@@ -6,22 +6,24 @@ const MOOD_SCORES = {
     "Neutral 😐": 3,
     "Stressed 😖": 2,
     "Excited 🤩": 5
-  };
+  } as const;
+
+  type MoodType = keyof typeof MOOD_SCORES;
 
 const MoodSchema = new Schema({
     userId: {
         type: String,
         required: true
     },
-    mood : {
+    mood: {
         type: String,
         required: true,
         enum: Object.keys(MOOD_SCORES),
         validate: {
-            validator: function(v: string) {
-              return v in MOOD_SCORES;
+            validator: function(v: string): v is MoodType {
+                return v in MOOD_SCORES;
             },
-            message: props => `${props.value} is not a valid mood`
+            message: (props: { value: string }) => `${props.value} is not a valid mood`
         }
     },
     note: {
@@ -45,7 +47,7 @@ const MoodSchema = new Schema({
 
 // Add pre-save hook to automatically set sentimentScore
 MoodSchema.pre('save', function(next) {
-    this.sentimentScore = MOOD_SCORES[this.mood as keyof typeof MOOD_SCORES];
+    this.sentimentScore = MOOD_SCORES[this.mood as MoodType];
     next();
 });
   

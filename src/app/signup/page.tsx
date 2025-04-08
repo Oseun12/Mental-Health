@@ -92,6 +92,16 @@ export default function SignupPage() {
               {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
             </div>
 
+            {/* <div className="mt-3">
+              <label className="block text-sm font-medium">Confirm Password</label>
+              <input
+                type="password"
+                {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be at least 6 characters" } })}
+                className="w-full p-2 border rounded-md mb-4"
+              />
+              {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
+            </div> */}
+
             <button
               type="submit"
               className="w-full mt-4 p-2 bg-rose-600 text-white rounded-md"
