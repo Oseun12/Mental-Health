@@ -14,7 +14,7 @@ const fadeIn = {
 
 function Introduction() {
   return (
-    <section className="bg-gray-50 py-20">
+    <section className="bg-gray-50 py-20" id="introduction">
       <div className="mx-auto max-w-screen-3xl px-4 lg:flex lg:items-center">
         <div className="text-center mx-auto">
           <motion.h1

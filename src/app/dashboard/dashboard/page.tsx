@@ -3,8 +3,7 @@ import { authOptions } from "@/utils/auth-options";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
-import Notification from "@/components/Notification";
-import GratitudeJournal from "@/components/GratitudeJournal";
+// import Notification from "@/components/Notification";
 import DashboardHero from "@/components/DashboardHero";
 
 export default async function Dashboard() {
@@ -15,7 +14,7 @@ export default async function Dashboard() {
     }
 
   return (
-    <div className="p-2">
+    <div className="p-10">
       <ToastContainer />
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
         Welcome{" "}
@@ -26,10 +25,7 @@ export default async function Dashboard() {
       </h1>
       <DashboardHero/>
       <MoodCheckIn />
-      {/* <MoodHistory /> */}
-      {/* <MoodTrendspro/> */}
-      <GratitudeJournal />
-      <Notification />
+      {/* <Notification /> */}
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function MoodHistory() {
     queryFn: async () => {
       const res = await fetch("/api/mood");
       const data = await res.json();
-      console.log("Fetched moods data:", data);
+      // console.log("Fetched moods data:", data);
       return data;
     },
     enabled: !!session,

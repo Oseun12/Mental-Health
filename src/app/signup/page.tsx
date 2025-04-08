@@ -45,7 +45,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-screen-md p-6 bg-white rounded-lg shadow-md">
+      <div className="w-full max-w-screen-sm p-6 bg-white rounded-lg shadow-md">
         <div className="max-w-md mx-auto py-10">
           <div className="flex justify-center">
             <Image
@@ -91,6 +91,16 @@ export default function SignupPage() {
               />
               {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
             </div>
+
+            {/* <div className="mt-3">
+              <label className="block text-sm font-medium">Confirm Password</label>
+              <input
+                type="password"
+                {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be at least 6 characters" } })}
+                className="w-full p-2 border rounded-md mb-4"
+              />
+              {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
+            </div> */}
 
             <button
               type="submit"

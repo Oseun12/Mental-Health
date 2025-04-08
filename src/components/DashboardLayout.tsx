@@ -30,6 +30,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     fetchSession();
   }, [router]);
 
+  // Function to generate initials from name
+  const getInitials = (name?: string | null) => {
+    if (!name) return "U";
+    const names = name.split(' ');
+    let initials = names[0].charAt(0).toUpperCase();
+    if (names.length > 1) {
+      initials += names[names.length - 1].charAt(0).toUpperCase();
+    }
+    return initials;
+  };
+
   return (
     <div className="flex h-screen">
       <aside
@@ -37,7 +48,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:translate-x-0 `}>
           <h2 className="text-lg font-bold mb-10">Dashboard</h2>
-            
         
           <nav className="flex flex-col gap-4 p-4  text-white h-full">
           <NavItem href="/dashboard/dashboard" icon={<FaHome />} label="Home" pathname={pathname} />
@@ -55,14 +65,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                onMouseLeave={() => setShowLogoutPopup(false)}
                onClick={() => setShowConfirmModal(true)}
                >
-                <div className="flex justify-between  items-center">
-                  <Image
-                    src={session.user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.name || "User")}`}
-                    alt="Profile Picture"
-                    width={50}
-                    height={40}
-                    className="rounded-full"
-                  />
+                <div className="flex justify-between items-center">
+                  {session.user?.image ? (
+                    <Image
+                      src={session.user.image}
+                      alt="Profile Picture"
+                      width={50}
+                      height={50}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                      {getInitials(session.user?.name)}
+                    </div>
+                  )}
                 
                   {showLogoutPopup && (
                     <div className="absolute bottom-full mb-2 px-3 py-1 bg-gray-700 text-white text-sm rounded shadow-lg">
@@ -72,7 +88,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
               
                 <div>
-                  <NavItem href="/dashboard/profile" icon={<FaUserCircle className="text-transparent" />} label="Profile" pathname={pathname} />
+                  <NavItem href="" icon={<FaUserCircle className="text-transparent" />} label="Profile" pathname={pathname} />
                 </div>
               </div>
             </div>
@@ -87,11 +103,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="fixed top-4 left-4  text-grat-800 p-2 rounded-md lg:hidden">
-          {isSidebarOpen ? <FaTimes size={24} className="fixed left-52 text-white" /> : <FiSidebar size={24} className="-ml-4" />}
+          {isSidebarOpen ? <FaTimes size={24} className="fixed left-52 text-white" /> : <FiSidebar size={24} className="-ml-4 " />}
         </button>
 
         {/* Page Content */}
-        <main className="p-10 lg:ml-64">{children}</main>
+        <main className="p- lg:ml-64">{children}</main>
       </div>
 
       {showConfirmModal && (

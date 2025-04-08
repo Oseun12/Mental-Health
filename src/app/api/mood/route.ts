@@ -1,40 +1,59 @@
 import connectViaMongoose from "@/lib/db";
-import Sentiment from "sentiment"; 
+// import Sentiment from "sentiment"; 
 import Mood from "@/models/Mood"; 
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/utils/auth-options";
+import { MOOD_SCORES } from "@/lib/mood-constants";
 
 export async function POST(req: NextRequest) {
-    try {
-      await connectViaMongoose();
-      const session = await getServerSession(authOptions);
-  
-      if (!session || !session.user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-  
-      const { mood, note } = await req.json();
-      if (!mood) {
-        return NextResponse.json({ error: "Mood is required" }, { status: 400 });
-      }
-  
-      const sentiment = new Sentiment();
-      const analysis = sentiment.analyze(note || "");
-      const sentimentScore = analysis.score; 
-  
-      const newMood = await Mood.create({
-        userId: session.user.id,
-        mood,
-        note,
-        sentimentScore,
-      });
-  
-      return NextResponse.json({ message: "Mood saved successfully", mood: newMood }, { status: 201 });
-    } catch (error) {
-      return NextResponse.json({ message: "Something went wrong", error }, { status: 500 });
+  try {
+    await connectViaMongoose();
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { mood, note } = await req.json();
+    
+    if (!mood) {
+      return NextResponse.json({ error: "Mood is required" }, { status: 400 });
+    }
+
+    // Validate mood against our constants
+    if (!(mood in MOOD_SCORES)) {
+      return NextResponse.json(
+        { 
+          error: `Invalid mood. Valid moods are: ${Object.keys(MOOD_SCORES).join(", ")}`
+        },
+        { status: 400 }
+      );
+    }
+
+    const newMood = await Mood.create({
+      userId: session.user.id,
+      mood,
+      note,
+      sentimentScore: MOOD_SCORES[mood as keyof typeof MOOD_SCORES], 
+    });
+
+    return NextResponse.json(
+      { message: "Mood saved successfully", mood: newMood },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error saving mood:", error);
+    return NextResponse.json(
+      { 
+        message: "Failed to save mood",
+        error: error instanceof Error ? error.message : "Unknown error"
+      },
+      { status: 500 }
+    );
   }
+}
+
 
 
   export async function GET() {

@@ -11,7 +11,7 @@ export default function MentalHealthTip() {
     },
   });
 
-  console.log("Fetched Data:", data);
+  // console.log("Fetched Data:", data);
 
   return (
     <div className="p-4 bg-green-100 rounded-lg shadow-md text-center">
