@@ -67,6 +67,7 @@ export default function SignupPage() {
               <input
                 type="text"
                 {...register("name", { required: "Name is required" })}
+                placeholder="First name "
                 className="w-full p-2 border rounded-md mb-4"
               />
               {errors.name && <p className="text-red-500 text-sm">{String(errors.name.message)}</p>}
@@ -77,6 +78,7 @@ export default function SignupPage() {
               <input
                 type="email"
                 {...register("email", { required: "Email is required" })}
+                placeholder="Surname"
                 className="w-full p-2 border rounded-md mb-4"
               />
               {errors.email && <p className="text-red-500 text-sm">{String(errors.email.message)}</p>}
