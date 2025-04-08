@@ -12,23 +12,29 @@ interface SignupFormData {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 export default function SignupPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<SignupFormData>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const password = watch("password");
+
 
   const onSubmit = async (data: SignupFormData) => {
     setLoading(true);
     setError("");
 
+    const { ...payload } = data;
+
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -67,7 +73,7 @@ export default function SignupPage() {
               <input
                 type="text"
                 {...register("name", { required: "Name is required" })}
-                placeholder="First name "
+                placeholder="First name/ Full name "
                 className="w-full p-2 border rounded-md mb-4"
               />
               {errors.name && <p className="text-red-500 text-sm">{String(errors.name.message)}</p>}
@@ -78,7 +84,7 @@ export default function SignupPage() {
               <input
                 type="email"
                 {...register("email", { required: "Email is required" })}
-                placeholder="Surname"
+                placeholder="email address"
                 className="w-full p-2 border rounded-md mb-4"
               />
               {errors.email && <p className="text-red-500 text-sm">{String(errors.email.message)}</p>}
@@ -94,15 +100,21 @@ export default function SignupPage() {
               {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
             </div>
 
-            {/* <div className="mt-3">
+            <div className="mt-3">
               <label className="block text-sm font-medium">Confirm Password</label>
               <input
                 type="password"
-                {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be at least 6 characters" } })}
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
+                  validate: (value) => value === password || "Passwords do not match",
+                })}
                 className="w-full p-2 border rounded-md mb-4"
               />
-              {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
-            </div> */}
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
 
             <button
               type="submit"
