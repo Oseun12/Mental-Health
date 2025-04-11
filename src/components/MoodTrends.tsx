@@ -158,11 +158,11 @@ const MoodTrends = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen p-6">
+    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 min-h-screen p-6 ">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Mood Insights</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mt-20">Mood Insights</h1>
             <p className="text-gray-600">Track your emotional journey over time</p>
           </div>
           <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm">

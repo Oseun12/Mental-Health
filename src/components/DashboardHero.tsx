@@ -44,7 +44,7 @@ export default function DashboardHero() {
   const prevFact = () => setIndex((prevIndex) => (prevIndex - 1 + facts.length) % facts.length);
 
   return (
-    <div className="relative w-full min-h-[400px] sm:min-h-[500px] rounded-2xl overflow-hidden -z-50 shadow-xl">
+    <div className="relative w-full max-w-screen-2xl mx-auto min-h-[400px] sm:min-h-[500px] rounded-2xl overflow-hidden -z-50 shadow-xl">
       {/* Background Image with Gradient Overlay */}
       <div className="absolute inset-0">
         <Image
