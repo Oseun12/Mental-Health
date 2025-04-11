@@ -161,7 +161,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </button>
 
         {/* Page Content - Updated this section */}
-        <main className="p-4 w-full mx-auto"> {/* Centered container */}
+        <main className=" w-full  mx-auto"> {/* Centered container */}
           {children}
         </main>
       </div>
