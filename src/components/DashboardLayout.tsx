@@ -30,7 +30,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     fetchSession();
   }, [router]);
 
-  // Function to generate initials from name
   const getInitials = (name?: string | null) => {
     if (!name) return "U";
     const names = name.split(' ');
@@ -41,7 +40,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return initials;
   };
 
-  // Close sidebar when clicking on any nav item
   const handleNavItemClick = () => {
     setIsSidebarOpen(false);
   };
@@ -101,7 +99,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onClick={handleNavItemClick}
           />
 
-          {/* Profile & Logout Section */}
           {session && (
             <div className="fixed bottom-10 p-5 flex flex-col gap-3 items-center">
               <div
@@ -150,7 +147,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content Area */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${
         isSidebarOpen ? "ml-64" : "ml-0"
-      }`}>
+      } lg:ml-64`}> {/* Added lg:ml-64 */}
         {/* Mobile toggle button */}
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -163,8 +160,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
         </button>
 
-        {/* Page Content */}
-        <main className={`p-4 lg:ml-0 ${isSidebarOpen ? "ml-64" : "ml-0"}`}>
+        {/* Page Content - Updated this section */}
+        <main className="p-4 w-full mx-auto"> {/* Centered container */}
           {children}
         </main>
       </div>
